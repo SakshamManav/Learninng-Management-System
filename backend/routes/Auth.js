@@ -2,9 +2,8 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "your_secret_key";
-const { signup_user, login_user } = require("../models/Auth");
+const { signup_user, login_user, checkUserExists } = require("../models/Auth");
 const authenticate = require("../middleware/authenticate");
-
 
 router.post("/signup", authenticate, async (req, res) => {
   const data = req.body;
@@ -15,6 +14,8 @@ router.post("/signup", authenticate, async (req, res) => {
       name: data.username,
       email: data.email,
       role: data.role,
+      // provider: data.provider,
+      // provider_Id: data.provider_Id,
       profile_Picture: data.profile_Picture,
       bio: data.bio,
       contact: data.contact,
@@ -51,7 +52,22 @@ router.post("/login", authenticate, async (req, res) => {
       res.status(400).json({ msg: "User not found" });
     }
   } catch (error) {
-    console.error(error)
+    console.error(error);
+    res.status(500).json({ msg: "Some error occurred", err: error });
+  }
+});
+
+router.get("/userexist/:email", authenticate, async (req, res) => {
+  const email = req.params.email;
+  try {
+    const result = await checkUserExists(email);
+    if (result) {
+      res.status(200).json({ msg: "user exists", isExists: true });
+    } else {
+      res.status(404).json({ msg: "User does not exist", isExists: false });
+    }
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: "Some error occurred", err: error });
   }
 });

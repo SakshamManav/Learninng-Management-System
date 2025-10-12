@@ -39,7 +39,7 @@ async function signup_user(data) {
 
 async function login_user(data) {
   const { email } = data;
-//   console.log(email)
+  //   console.log(email)
   try {
     const sql = `Select username, email, role, profile_Picture,bio, contact from user where email = ?`;
     const [rows] = await db_pool.execute(sql, [email]);
@@ -54,4 +54,19 @@ async function login_user(data) {
   }
 }
 
-module.exports = { signup_user, login_user };
+async function checkUserExists(email) {
+  try {
+    const sql = `select username from user where email = ?`;
+    const [rows] = await db_pool.execute(sql, [email]);
+    // console.log(rows)
+    if (rows.length > 0) {
+      return rows[0];
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+module.exports = { signup_user, login_user, checkUserExists };
