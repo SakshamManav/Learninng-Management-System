@@ -12,6 +12,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", require("./routes/Auth"));
+app.use('/course', require('./routes/CourseDescription'))
 
 // middleware handle
 
