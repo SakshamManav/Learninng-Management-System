@@ -34,11 +34,14 @@ const createCourseDescription = async (data) => {
   }
 };
 
+
+
+
 const getCourseDescription = async (courseId) => {
   try {
     const sql = `SELECT * from courses where id = ?`;
-    const [result] = await db.execute(sql, courseId);
-    return result;
+    const [result] = await db.execute(sql, [courseId]);
+    return result[0];
   } catch (error) {
     console.error(error);
     throw error;

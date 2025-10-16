@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = "your_secret_key";
 const { signup_user, login_user, checkUserExists } = require("../models/Auth");
-const authenticate = require("../middleware/authenticate");
+const authenticate = require("../middleware/auth0Authenticate");
 
 router.post("/signup", authenticate, async (req, res) => {
   const data = req.body;
@@ -14,8 +14,6 @@ router.post("/signup", authenticate, async (req, res) => {
       name: data.username,
       email: data.email,
       role: data.role,
-      // provider: data.provider,
-      // provider_Id: data.provider_Id,
       profile_Picture: data.profile_Picture,
       bio: data.bio,
       contact: data.contact,

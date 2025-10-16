@@ -11,8 +11,10 @@ app.get("/", (req, res) => {
   return res.send("Backend is working well");
 });
 
-app.use("/auth", require("./routes/Auth"));
-app.use('/course', require('./routes/CourseDescription'))
+app.use("/auth", require("./routes/Auth")); // user and authentcation
+app.use('/course', require('./routes/CourseDescription')) // course description
+app.use('/course', require('./routes/CourseSection')) // course sections route
+
 
 // middleware handle
 
