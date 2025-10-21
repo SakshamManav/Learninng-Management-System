@@ -41,7 +41,7 @@ async function login_user(data) {
   const { email } = data;
   //   console.log(email)
   try {
-    const sql = `Select username, email, role, profile_Picture,bio, contact from user where email = ?`;
+    const sql = `Select id, username, email, role, profile_Picture,bio, contact from user where email = ?`;
     const [rows] = await db_pool.execute(sql, [email]);
     if (rows.length > 0) {
       return rows[0];

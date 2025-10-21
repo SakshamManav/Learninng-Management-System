@@ -3,7 +3,9 @@ const port = 3001;
 const app = express();
 const db_pool = require("./config/db");
 const cors = require("cors");
+const dotenv = require('dotenv')
 
+dotenv.config();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
@@ -14,7 +16,7 @@ app.get("/", (req, res) => {
 app.use("/auth", require("./routes/Auth")); // user and authentcation
 app.use('/course', require('./routes/CourseDescription')) // course description
 app.use('/course', require('./routes/CourseSection')) // course sections route
-
+app.use('/course', require('./routes/CourseVideo')) // for course videos
 
 // middleware handle
 

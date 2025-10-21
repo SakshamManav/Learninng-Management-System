@@ -5,6 +5,8 @@ const JWT_SECRET = "your_secret_key";
 const { signup_user, login_user, checkUserExists } = require("../models/Auth");
 const authenticate = require("../middleware/auth0Authenticate");
 
+// ----TODO----------
+//  i am not sending user id when signup the user in payload using middleware but in login it has done
 router.post("/signup", authenticate, async (req, res) => {
   const data = req.body;
 
