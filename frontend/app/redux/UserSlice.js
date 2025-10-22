@@ -62,13 +62,53 @@ const initialState = {
   loading: false,
   error: null,
   isUserExists:false,
+  isLoggedin:false,
+  isInitilized:false,
 };
 
 const UserSlice = createSlice({
   name: "User",
-  initialState,
-  reducers: {},
-  extraReducers: (builder) =>{
+  initialState: {
+    user: {},
+    loading: false,
+    error: null,
+    isUserExists: false,
+    isLoggedin: false,
+    isInitialized: false, // ✅ Add this to track if auth check is complete
+  },
+  reducers: {
+    initializeUser: (state) => {
+      if (typeof window !== 'undefined') {
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('localToken');
+        if (storedUser && storedToken) {
+          try {
+            state.user = JSON.parse(storedUser);
+            state.isLoggedin = true; // ✅ Set login status
+          } catch (error) {
+            console.error('Error parsing user data:', error);
+            localStorage.removeItem('user');
+            localStorage.removeItem('localToken');
+            state.isLoggedin = false;
+          }
+        } else {
+          state.isLoggedin = false;
+        }
+        state.isInitialized = true; // ✅ Mark as initialized
+      }
+    },
+    logoutUser: (state) => {
+      state.user = {};
+      state.error = null;
+      state.isLoggedin = false; // ✅ Set login status
+      state.isInitialized = true; // Keep initialized as true
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('localToken');
+      }
+    }
+  },
+  extraReducers: (builder) => {
     builder
       .addCase(signupUser.pending, (state)=>{
         state.loading = true;
@@ -77,8 +117,11 @@ const UserSlice = createSlice({
       .addCase(signupUser.fulfilled, (state, action) => {
         console.log("Signup fulfilled action:", action);
         state.loading = false;
-         localStorage.setItem('localToken', action.payload.token);
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
+        localStorage.setItem('localToken', action.payload.token);
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        state.user = action.payload.user;
+        state.isLoggedin = true; // ✅ Set login status
+        state.isInitialized = true; // ✅ Set initialized
         state.error = null;
       })
       .addCase(signupUser.rejected, (state, action)=>{
@@ -94,8 +137,11 @@ const UserSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action)=>{
         state.loading = false;
-        localStorage.setItem('localToken', JSON.stringify(action.payload.token))
+        localStorage.setItem('localToken', action.payload.token); // ✅ Fixed double stringify
         localStorage.setItem('user', JSON.stringify(action.payload.user));
+        state.user = action.payload.user;
+        state.isLoggedin = true; // ✅ Set login status
+        state.isInitialized = true; // ✅ Set initialized
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action)=>{
@@ -123,4 +169,5 @@ const UserSlice = createSlice({
 
 
 export {loginUser, signupUser, checkUserExists};
+export const { initializeUser, logoutUser } = UserSlice.actions;
 export default UserSlice.reducer;

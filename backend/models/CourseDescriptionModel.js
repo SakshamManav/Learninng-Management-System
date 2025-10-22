@@ -1,5 +1,23 @@
 const db = require("../config/db");
 
+
+
+const getAllCourses = async (data) =>{
+  try {
+    const sql = `SELECT * FROM courses`;
+    const [result] = await db.execute(sql);
+    if(result.length > 0){
+      return result;
+    }else{
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+
 const createCourseDescription = async (data) => {
   const {
     title,
@@ -48,4 +66,4 @@ const getCourseDescription = async (courseId) => {
   }
 };
 
-module.exports = {createCourseDescription, getCourseDescription};
+module.exports = {createCourseDescription, getCourseDescription, getAllCourses};

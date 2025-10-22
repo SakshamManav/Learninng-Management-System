@@ -3,8 +3,29 @@ const router = express.Router();
 const {
   createCourseDescription,
   getCourseDescription,
+  getAllCourses,
 } = require("../models/CourseDescriptionModel");
 const { authenticateRoutes } = require("../middleware/authentication");
+
+// get all courses
+
+router.get("/allcourses", authenticateRoutes, async (req, res) => {
+  try {
+    const response = await getAllCourses();
+    if (response) {
+      res
+        .status(200)
+        .json({ msg: "Courses fetched successfully", courses: response });
+    } else {
+      res.status(400).json({ msg: "No courses are there" });
+    }
+  } catch (error) {
+    res.status(500).json({ msg: "Some error occured", err: error.message });
+    console.error(error);
+  }
+});
+
+// posting sourcing description
 
 router.post("/description", authenticateRoutes, async (req, res) => {
   const data = req.body;
@@ -19,14 +40,15 @@ router.post("/description", authenticateRoutes, async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ msg: "Some error occured", err: error.message });
-    console.error(error)
+    console.error(error);
   }
 });
 
+// get a specific course
 router.get("/description/:id", authenticateRoutes, async (req, res) => {
   const courseId = req.params.id;
-//   console.log(req.user)
-  
+  //   console.log(req.user)
+
   try {
     const response = await getCourseDescription(courseId);
     if (response) {
@@ -38,7 +60,7 @@ router.get("/description/:id", authenticateRoutes, async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ msg: "Some error occured", err: error.message });
-    console.error(error)
+    console.error(error);
   }
 });
 module.exports = router;

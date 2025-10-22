@@ -3,6 +3,7 @@ import "./globals.css";
 import { Auth0ProviderClient } from "./authprovider";
 
 import ReduxProvider from "./Reduxprovider";
+import AuthLoadingWrapper from "./components/AuthLoadingWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReduxProvider>
-          <Auth0ProviderClient>{children}</Auth0ProviderClient>
+          <Auth0ProviderClient>
+            <AuthLoadingWrapper>{children}</AuthLoadingWrapper>
+          </Auth0ProviderClient>
         </ReduxProvider>
       </body>
     </html>
