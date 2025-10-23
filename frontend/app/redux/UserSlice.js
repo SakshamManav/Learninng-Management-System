@@ -94,7 +94,7 @@ const UserSlice = createSlice({
         } else {
           state.isLoggedin = false;
         }
-        state.isInitialized = true; // ✅ Mark as initialized
+        state.isInitialized = true; 
       }
     },
     logoutUser: (state) => {
@@ -105,6 +105,7 @@ const UserSlice = createSlice({
       if (typeof window !== 'undefined') {
         localStorage.removeItem('user');
         localStorage.removeItem('localToken');
+        
       }
     }
   },

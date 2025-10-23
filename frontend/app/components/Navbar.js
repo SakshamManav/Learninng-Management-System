@@ -28,10 +28,7 @@ export default function Navbar() {
     dispatch(initializeUser());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log(user)
-  }, [user]);
-
+  
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -60,6 +57,7 @@ export default function Navbar() {
     localStorage.removeItem('user');
     localStorage.removeItem("auth0_User");
     localStorage.removeItem("localToken");
+    localStorage.removeItem('courses')
     setIsLoggedin(false);
     setIsProfileDropdownOpen(false);
   };
@@ -85,7 +83,7 @@ export default function Navbar() {
           {/* Left side - Logo and Categories */}
           <div className="flex items-center space-x-8 flex-shrink-0">
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-purple-600">EduPlatform</span>
+              <img src='/logo2.png' alt='eduKnow' className='h-[200px] w-[200px]' />
             </div>
             <div className="hidden lg:block">
               <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">

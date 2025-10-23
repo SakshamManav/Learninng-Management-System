@@ -18,26 +18,29 @@ const getAllCourses = createAsyncThunk("course/getAllCourses", async () => {
   }
 
   const result = await response.json();
-  console.log(result);
+  
   return result;
 });
+
+  const getSpecificCourseById = createAsyncThunk('course/specificCourse', async(courseId)=>{
+    const response = await fetch(`${baseURL}/description/${courseId}`, {
+      method:"GET",
+      headers:{
+        Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      }
+    })
+    if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    console.log(result)
+    return result;
+  })
+
 
 const initialState = {
   courses: [],
   currentCourse: {
-    id: "",
-    title: "",
-    description: "",
-    category: "",
-    level: "",
-    price: "",
-    language: "",
-    thumbnail: "",
-    instructor_id: "",
-    what_you_will_learn: "",
-    requirements: "",
-    created_at: "",
-    updated_at: "",
   },
   courseSection: [], // current course section
   loading: false,
@@ -56,6 +59,7 @@ const courseSlice = createSlice({
             try {
                 state.courses = JSON.parse(storedCourses);
                 state.isInitialized = true;
+                // console.log(state.courses)
             } catch (error) {
                 console.error('Error parsing courses:', error);
             localStorage.removeItem('courses');
@@ -66,6 +70,8 @@ const courseSlice = createSlice({
         }
       }
     },
+
+    
   },
   extraReducers: (builder) => {
     builder
@@ -82,10 +88,26 @@ const courseSlice = createSlice({
       .addCase(getAllCourses.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
-      });
+      })
+
+      // sepcific course by id
+      .addCase(getSpecificCourseById.pending, (state)=>{
+        state.loading = true;
+        state.isInitialized = false;
+      })
+      .addCase(getSpecificCourseById.fulfilled, (state, action)=>{
+        state.currentCourse = action.payload.details;
+        state.loading = false;
+        state.isInitialized = true;
+      })
+      .addCase(getSpecificCourseById.rejected, (state, action)=>{
+        state.loading = false;
+        state.error = action.error.message;
+        state.isInitialized = false;
+      })
   },
 });
 
-export { getAllCourses };
+export { getAllCourses, getSpecificCourseById };
 export const {intiializeCourses} = courseSlice.actions;
 export default courseSlice.reducer;

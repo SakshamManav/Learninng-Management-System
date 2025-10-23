@@ -4,7 +4,13 @@ const db = require("../config/db");
 
 const getAllCourses = async (data) =>{
   try {
-    const sql = `SELECT * FROM courses`;
+    const sql = ` SELECT 
+        c.*, 
+        u.username AS instructor_name
+        
+      FROM courses c
+      JOIN user u 
+        ON c.instructor_id = u.id`;
     const [result] = await db.execute(sql);
     if(result.length > 0){
       return result;
@@ -57,7 +63,13 @@ const createCourseDescription = async (data) => {
 
 const getCourseDescription = async (courseId) => {
   try {
-    const sql = `SELECT * from courses where id = ?`;
+    const sql = `SELECT 
+        c.*, 
+        u.username AS instructor_name
+      FROM courses c
+      JOIN user u 
+        ON c.instructor_id = u.id
+      WHERE c.id = ?`;
     const [result] = await db.execute(sql, [courseId]);
     return result[0];
   } catch (error) {
