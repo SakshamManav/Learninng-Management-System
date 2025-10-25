@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeUser } from '../redux/UserSlice';
+import Link from 'next/link';
 // import img from 'next/img';
 
 export default function Navbar() {
@@ -82,9 +83,9 @@ export default function Navbar() {
           
           {/* Left side - Logo and Categories */}
           <div className="flex items-center space-x-8 flex-shrink-0">
-            <div className="flex items-center">
+            <Link className="flex items-center" href={'/'}>
               <img src='/logo2.png' alt='eduKnow' className='h-[200px] w-[200px]' />
-            </div>
+            </Link>
             <div className="hidden lg:block">
               <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                 Categories

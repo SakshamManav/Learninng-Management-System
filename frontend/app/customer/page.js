@@ -1,14 +1,18 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllCourses, intiializeCourses } from '../redux/CourseSlice';
+import React, { useState, useEffect } from "react";
+import Navbar from "../components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCourses, intiializeCourses } from "../redux/CourseSlice";
+
+import Link from "next/link";
 
 export default function CustomerPage() {
-  const { courses, loading, error, isInitialized } = useSelector((state) => state.course);
+  const { courses, loading, error, isInitialized } = useSelector(
+    (state) => state.course
+  );
   const dispatch = useDispatch();
-  const [searchQuery, setSearchQuery] = useState('');
-  
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     dispatch(intiializeCourses());
   }, [dispatch]);
@@ -20,76 +24,95 @@ export default function CustomerPage() {
   }, [dispatch, isInitialized, courses]);
 
   // Filter courses based on search
-  const filteredCourses = courses.filter(course => 
-    course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    course.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const CourseCard = ({ course }) => (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
-      <div className="relative h-48">
-        <img 
-          src={course.thumbnail || "/api/placeholder/300/200"} 
-          alt={course.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded text-xs">
-          {course.level || 'All Levels'}
-        </div>
-        {/* Category badge */}
-        <div className="absolute bottom-3 left-3 bg-purple-600/90 text-white px-2 py-1 rounded text-xs font-medium">
-          {course.category || 'General'}
-        </div>
-      </div>
-      
-      <div className="p-6">
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
-          {course.title}
-        </h3>
-        
-        <p className="text-gray-600 text-sm mb-3">Instructor : {course.instructor_name}</p>
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center text-gray-600 text-sm">
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Duration
+    <Link href={`/customer/course/${course.id}`}>
+      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+        <div className="relative h-48">
+          <img
+            src={course.thumbnail || "/api/placeholder/300/200"}
+            alt={course.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded text-xs">
+            {course.level || "All Levels"}
+          </div>
+          {/* Category badge */}
+          <div className="absolute bottom-3 left-3 bg-purple-600/90 text-white px-2 py-1 rounded text-xs font-medium">
+            {course.category || "General"}
           </div>
         </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-xl text-gray-900">${course.price || '0'}</span>
+
+        <div className="p-6">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+            {course.title}
+          </h3>
+
+          <p className="text-gray-600 text-sm mb-3">
+            Instructor : {course.instructor_name}
+          </p>
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center text-gray-600 text-sm">
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Duration
+            </div>
           </div>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
-            Enroll Now
-          </button>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-xl text-gray-900">
+                ${course.price || "0"}
+              </span>
+            </div>
+            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+              Enroll Now
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Discover Your Next Course</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Discover Your Next Course
+            </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
               Explore courses and start learning today
             </p>
-            
+
             {/* Course Count */}
             <div className="mb-6">
               <p className="text-lg text-purple-100">
                 {courses.length} courses available
               </p>
             </div>
-            
+
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto relative">
               <input
@@ -100,8 +123,18 @@ export default function CustomerPage() {
                 className="w-full px-6 py-4 text-gray-900 rounded-full text-lg focus:outline-none focus:ring-4 focus:ring-white/30"
               />
               <button className="absolute right-2 top-2 bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </button>
             </div>
@@ -114,9 +147,11 @@ export default function CustomerPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
-              {searchQuery ? `Search Results (${filteredCourses.length})` : 'All Courses'}
+              {searchQuery
+                ? `Search Results (${filteredCourses.length})`
+                : "All Courses"}
             </h2>
-            
+
             <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
               <option>Most Popular</option>
               <option>Highest Rated</option>
@@ -125,7 +160,7 @@ export default function CustomerPage() {
               <option>Price: High to Low</option>
             </select>
           </div>
-          
+
           {/* Loading State */}
           {loading && (
             <div className="text-center py-16">
@@ -133,17 +168,27 @@ export default function CustomerPage() {
               <p className="text-gray-600">Loading courses...</p>
             </div>
           )}
-          
+
           {/* Error State */}
           {error && (
             <div className="text-center py-16">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <p className="text-gray-600 mb-4">Failed to load courses</p>
-              <button 
+              <button
                 onClick={() => dispatch(getAllCourses())}
                 className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
               >
@@ -151,7 +196,7 @@ export default function CustomerPage() {
               </button>
             </div>
           )}
-          
+
           {/* Courses Grid */}
           {!loading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -160,18 +205,32 @@ export default function CustomerPage() {
               ))}
             </div>
           )}
-          
+
           {/* No Courses Found */}
           {!loading && !error && filteredCourses.length === 0 && (
             <div className="text-center py-16">
               <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-12 h-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No courses found</h3>
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                No courses found
+              </h3>
               <p className="text-gray-500">
-                {searchQuery ? 'Try adjusting your search criteria' : 'No courses available'}
+                {searchQuery
+                  ? "Try adjusting your search criteria"
+                  : "No courses available"}
               </p>
             </div>
           )}

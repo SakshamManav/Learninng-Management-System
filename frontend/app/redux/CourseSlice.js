@@ -33,16 +33,47 @@ const getAllCourses = createAsyncThunk("course/getAllCourses", async () => {
       throw new Error("Failed to fetch course details");
     }
     const result = await response.json();
-    console.log(result)
+    // console.log(result)
     return result;
   })
 
 
+
+  const getAllSectionsOfCourse = createAsyncThunk('course/sectionCourse', async(courseId)=>{
+    const response = await fetch(`${baseURL}/section/${courseId}`, {
+      method:"GET",
+      headers:{
+       Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      }
+    })
+     if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    // console.log(result)
+    return result;
+  })
+
+  const getAllVideosInfoOfACourse = createAsyncThunk('course/videoInfoCourse', async(courseId)=>{
+    const response = await fetch(`${baseURL}/video/${courseId}`, {
+      method:"GET",
+      headers:{
+       Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      }
+    })
+     if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    console.log(result)
+    return result;
+  })
+
 const initialState = {
   courses: [],
-  currentCourse: {
-  },
+  currentCourse: {}, // curent course 
   courseSection: [], // current course section
+  courseVideoInfo:[],
   loading: false,
   error: null,
   isInitialized:false,
@@ -75,6 +106,7 @@ const courseSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    // Get all course
       .addCase(getAllCourses.pending, (state) => {
         state.loading = true;
       })
@@ -90,7 +122,7 @@ const courseSlice = createSlice({
         state.loading = false;
       })
 
-      // sepcific course by id
+      // sepcific course by id -- GET
       .addCase(getSpecificCourseById.pending, (state)=>{
         state.loading = true;
         state.isInitialized = false;
@@ -105,9 +137,43 @@ const courseSlice = createSlice({
         state.error = action.error.message;
         state.isInitialized = false;
       })
+
+      // all sections of specific course by course id -- GET
+      .addCase(getAllSectionsOfCourse.pending, (state)=>{
+        state.loading = true;
+        state.isInitialized = false;
+      })
+      .addCase(getAllSectionsOfCourse.fulfilled, (state, action)=>{
+        state.loading = false;
+        state.isInitialized = true;
+        state.courseSection = action.payload.sections;
+      })
+      .addCase(getAllSectionsOfCourse.rejected, (state, action)=>{
+        state.loading = false;
+        state.isInitialized = false;
+        state.error = action.error.message;
+      })
+
+      // all video info a course -- get
+
+      .addCase(getAllVideosInfoOfACourse.pending, (state)=>{
+        state.loading = true;
+        state.isInitialized = false;
+      })
+      .addCase(getAllVideosInfoOfACourse.fulfilled, (state, action)=>{
+        state.loading = false;
+        state.isInitialized = true;
+        state.courseVideoInfo = action.payload.videos;
+      })
+      .addCase(getAllVideosInfoOfACourse.rejected, (state, action)=>{
+        state.loading = false;
+        state.isInitialized = false;
+        state.error = action.error.message;
+      })
+      
   },
 });
 
-export { getAllCourses, getSpecificCourseById };
+export { getAllCourses, getSpecificCourseById, getAllSectionsOfCourse, getAllVideosInfoOfACourse };
 export const {intiializeCourses} = courseSlice.actions;
 export default courseSlice.reducer;

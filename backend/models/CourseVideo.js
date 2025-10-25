@@ -3,6 +3,7 @@ const db = require("../config/db");
 async function storeVideoInfo(data) {
   const {
     section_id,
+    course_id,
     title,
     video_url,
     duration,
@@ -15,11 +16,12 @@ async function storeVideoInfo(data) {
   } = data;
 
   try {
-    const sql = `INSERT INTO course_video(section_id,title,video_url, duration, position, is_preview, resources, filename,
+    const sql = `INSERT INTO course_video(section_id, course_id, title,video_url, duration, position, is_preview, resources, filename,
     mime_type,
     size) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
       section_id,
+      course_id,
       title,
       video_url,
       duration ?? null,
@@ -38,6 +40,8 @@ async function storeVideoInfo(data) {
   }
 }
 
+// To get specific video info
+
 async function getVideoInfo(videoId) {
   try {
     const sql = `SELECT video_url, is_preview, section_id FROM course_video WHERE ID = ?`;
@@ -54,4 +58,23 @@ async function getVideoInfo(videoId) {
   }
 }
 
-module.exports = { storeVideoInfo, getVideoInfo };
+// to get all video of course using course ID
+
+async function getAllVideosInfoOfCourse(courseId) {
+  try {
+    const sql = `select * from course_video where course_id = ?`
+    const params  = [courseId];
+
+    const [result] = await db.execute(sql, params);
+    if(result.length > 0){
+      return result;
+    }else{
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+module.exports = { storeVideoInfo, getVideoInfo, getAllVideosInfoOfCourse };
