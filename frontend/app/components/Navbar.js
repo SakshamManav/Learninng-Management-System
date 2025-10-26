@@ -87,9 +87,9 @@ export default function Navbar() {
               <img src='/logo2.png' alt='eduKnow' className='h-[200px] w-[200px]' />
             </Link>
             <div className="hidden lg:block">
-              <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
-                Categories
-              </button>
+              <Link href={`/customer`} className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+                Course
+              </Link>
             </div>
           </div>
 
@@ -309,9 +309,9 @@ export default function Navbar() {
               </form>
               
               {/* Mobile Menu Items */}
-              <button className="block w-full text-left px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded">
-                Categories
-              </button>
+              <Link href={`/course`} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded">
+                Courses
+              </Link>
               {user.role === 'seller' ? (
                 <button className="block w-full text-left px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded">
                   Teach on EduPlatform

@@ -3,10 +3,12 @@ import React, { use, useEffect, useState } from "react";
 import {
   getSpecificCourseById,
   getAllSectionsOfCourse,
-  getAllVideosInfoOfACourse
+  getAllVideosInfoOfACourse,
+  clearCurrentCourse
 } from "@/app/redux/CourseSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "@/app/components/Navbar";
+import Link from "next/link";
 
 export default function CourseDetailsPage({ params }) {
   const unwrappedParams = use(params);
@@ -20,23 +22,21 @@ export default function CourseDetailsPage({ params }) {
   // State for managing which sections are expanded
   const [expandedSections, setExpandedSections] = useState({});
 
-  useEffect(()=>{
-      dispatch(getAllSectionsOfCourse(courseId));
-       dispatch(getAllVideosInfoOfACourse(courseId));
-  }, [])
+  useEffect(() => {
+    // Clear previous course data when courseId changes
+    dispatch(clearCurrentCourse());
+    
+    // Fetch new course data
+    dispatch(getSpecificCourseById(courseId));
+    dispatch(getAllSectionsOfCourse(courseId));
+    dispatch(getAllVideosInfoOfACourse(courseId));
+  }, [courseId, dispatch])
   
   useEffect(() => {
-    const isEmptyCourseObject =
-      !currentCourse ||
-      Object.keys(currentCourse).length === 0 ||
-      !currentCourse.title;
-    // dispatch(getAllSectionsOfCourse(courseId));
-    if (isEmptyCourseObject) {
-      dispatch(getSpecificCourseById(courseId));
-    }
-    // console.log(courseSection);
-    console.log(courseVideoInfo);
-  }, [dispatch, courseId, currentCourse, courseSection, courseVideoInfo]);
+    console.log('Current Course ID:', currentCourse?.id, 'URL Course ID:', parseInt(courseId));
+    console.log('Course Sections:', courseSection);
+    console.log('Course Videos:', courseVideoInfo);
+  }, [currentCourse, courseSection, courseVideoInfo, courseId]);
 
   // Toggle section expansion
   const toggleSection = (sectionId) => {
@@ -93,7 +93,7 @@ export default function CourseDetailsPage({ params }) {
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-700 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading course details...</p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function CourseDetailsPage({ params }) {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white py-20 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white py-20 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -131,7 +131,7 @@ export default function CourseDetailsPage({ params }) {
                 <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold border border-white/20 shadow-lg">
                   {currentCourse.category}
                 </span>
-                <span className="bg-emerald-500/30 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold border border-emerald-300/30 shadow-lg">
+                <span className="bg-red-500/30 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold border border-red-300/30 shadow-lg">
                   {currentCourse.level}
                 </span>
               </div>
@@ -140,12 +140,12 @@ export default function CourseDetailsPage({ params }) {
                 {currentCourse.title}
               </h1>
 
-              <p className="text-xl mb-6 text-purple-100">
+              <p className="text-xl mb-6 text-red-100">
                 {currentCourse.description}
               </p>
 
               <div className="flex items-center space-x-6 mb-8">
-                <div className="flex items-center text-purple-100">
+                <div className="flex items-center text-red-100">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
@@ -155,7 +155,7 @@ export default function CourseDetailsPage({ params }) {
                   </svg>
                   Instructor: {currentCourse.instructor_name}
                 </div>
-                <div className="flex items-center text-purple-100">
+                <div className="flex items-center text-red-100">
                   <svg
                     className="w-5 h-5 mr-2"
                     fill="currentColor"
@@ -175,7 +175,7 @@ export default function CourseDetailsPage({ params }) {
                 <div className="text-3xl font-bold">
                   ₹{parseFloat(currentCourse.price).toLocaleString()}
                 </div>
-                <button className="bg-white text-teal-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-teal-50 hover:text-teal-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-white/20">
+                <button className="bg-white text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-red-50 hover:text-gray-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-white/20">
                   Enroll Now
                 </button>
               </div>
@@ -219,23 +219,23 @@ export default function CourseDetailsPage({ params }) {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Course Content/Sections */}
-              <div className="bg-white rounded-xl shadow-sm border p-8">
+              <div className="bg-gray-300 rounded-xl shadow-sm border p-8 ">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-black">
                     Course Content
                   </h2>
                   {courseSection && courseSection.length > 0 && (
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={expandAll}
-                        className="text-sm text-teal-600 hover:text-teal-700 font-semibold bg-teal-50 px-3 py-1 rounded-md border border-teal-200 hover:bg-teal-100 transition-all duration-200"
+                        className="text-sm text-gray-700 hover:text-gray-800 font-semibold bg-red-50 px-3 py-1 rounded-md border border-red-200 hover:bg-red-100 transition-all duration-200"
                       >
                         Expand All
                       </button>
                       <span className="text-gray-300 mx-2">|</span>
                       <button
                         onClick={collapseAll}
-                        className="text-sm text-emerald-600 hover:text-emerald-700 font-semibold bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200 hover:bg-emerald-100 transition-all duration-200"
+                        className="text-sm text-gray-600 hover:text-gray-700 font-semibold bg-red-50 px-3 py-1 rounded-md border border-red-200 hover:bg-red-100 transition-all duration-200"
                       >
                         Collapse All
                       </button>
@@ -243,21 +243,23 @@ export default function CourseDetailsPage({ params }) {
                   )}
                 </div>                  <div className="space-y-2">
                     {courseSection && courseSection.length > 0 ? courseSection.map((section, index) => (
+                     
                       <div
                         key={section.id}
-                        className="border border-teal-200 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300"
+
+                        className="border border-red-200 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300"
                       >
                         {/* Section Header */}
                         <button
                           onClick={() => toggleSection(section.id)}
-                          className="w-full flex items-center justify-between p-5 text-left bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 transition-all duration-300 rounded-t-xl border-b border-teal-200"
+                          className="w-full flex items-center justify-between p-5 text-left bg-gradient-to-r from-red-50 to-red-50 hover:from-red-100 hover:to-red-100 transition-all duration-300 rounded-t-xl border-b border-red-200"
                         >
                           <div className="flex items-center space-x-3">
-                            <span className="text-sm font-bold text-teal-600 min-w-[2rem] bg-teal-100 px-2 py-1 rounded-md">
+                            <span className="text-sm font-bold text-gray-900 min-w-[2rem] bg-red-100 px-2 py-1 rounded-md">
                               {index + 1}.
                             </span>
                             <div>
-                              <h3 className="text-lg font-bold text-teal-800">
+                              <h3 className="text-lg font-bold text-gray-800">
                                 {section.title || `Section ${index + 1}`}
                               </h3>
                               <p className="text-sm text-gray-500">
@@ -272,7 +274,7 @@ export default function CourseDetailsPage({ params }) {
 
                           {/* Expand/Collapse Icon */}
                           <svg
-                            className={`w-6 h-6 text-teal-600 transition-transform duration-300 ${
+                            className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${
                               expandedSections[section.id] ? "rotate-180" : ""
                             }`}
                             fill="none"
@@ -294,6 +296,7 @@ export default function CourseDetailsPage({ params }) {
                             {videosBySection[section.id] && videosBySection[section.id].length > 0 ? (
                               <div className="p-4 space-y-3">
                                 {videosBySection[section.id].map((video, videoIndex) => (
+                                  
                                   <div
                                     key={video.id}
                                     className="flex items-center space-x-4 p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200 cursor-pointer group"
@@ -317,15 +320,15 @@ export default function CourseDetailsPage({ params }) {
                                         </div>
                                       ) : (
                                         // Video icon for actual video files
-                                        <div className="w-16 h-12 bg-teal-100 rounded-lg flex items-center justify-center group-hover:bg-teal-200 transition-colors">
-                                          <svg className="w-6 h-6 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <div className="w-16 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                          <svg className="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                                           </svg>
                                         </div>
                                       )}
                                       
                                       {/* Video number badge */}
-                                      <div className="absolute -top-2 -left-2 w-6 h-6 bg-teal-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                      <div className="absolute -top-2 -left-2 w-6 h-6 bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                         {video.position || videoIndex + 1}
                                       </div>
                                     </div>
@@ -333,9 +336,9 @@ export default function CourseDetailsPage({ params }) {
                                     {/* Video Info */}
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center space-x-2 mb-1">
-                                        <h4 className="text-sm font-semibold text-gray-900 truncate group-hover:text-teal-700 transition-colors">
+                                        <Link href={`/customer/course/${courseId}/video/${video.id}`} className="text-sm font-semibold text-gray-900 truncate group-hover:text-red-700 transition-colors">
                                           {video.title || `Video ${videoIndex + 1}`}
-                                        </h4>
+                                        </Link>
                                         
                                         {/* Preview badge */}
                                         {video.is_preview && (
@@ -400,25 +403,25 @@ export default function CourseDetailsPage({ params }) {
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-teal-600">
+                        <div className="text-2xl font-bold text-gray-900">
                           {courseSection ? courseSection.length : 0}
                         </div>
                         <div className="text-sm text-gray-500">Sections</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-emerald-600">
+                        <div className="text-2xl font-bold text-gray-900">
                           {courseVideoInfo ? courseVideoInfo.length : 0}
                         </div>
                         <div className="text-sm text-gray-500">Videos</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-teal-600">
+                        <div className="text-2xl font-bold text-gray-900">
                           {currentCourse.level || "All"}
                         </div>
                         <div className="text-sm text-gray-500">Level</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-emerald-600">
+                        <div className="text-2xl font-bold text-gray-900">
                           {currentCourse.language || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">Language</div>
@@ -428,9 +431,9 @@ export default function CourseDetailsPage({ params }) {
                 </div>
 
               {/* What You'll Learn */}
-              <div className="bg-white rounded-2xl shadow-lg border-2 border-teal-100 p-8 hover:shadow-xl transition-all duration-300">
-                <h2 className="text-3xl font-bold text-teal-800 mb-6 flex items-center">
-                  <svg className="w-8 h-8 mr-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-gray-300 rounded-2xl shadow-lg border-2 border-red-100 p-8 hover:shadow-xl transition-all duration-300">
+                <h2 className="text-3xl font-bold text-black mb-6 flex items-center">
+                  <svg className="w-8 h-8 mr-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                   What you will learn
@@ -451,7 +454,7 @@ export default function CourseDetailsPage({ params }) {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-gray-700">{item}</span>
+                        <span className="text-black">{item}</span>
                       </div>
                     ))
                   ) : (
@@ -476,8 +479,8 @@ export default function CourseDetailsPage({ params }) {
               </div>
 
               {/* Requirements */}
-              <div className="bg-white rounded-xl shadow-sm border p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <div className="bg-gray-300 rounded-xl shadow-sm border p-8">
+                <h2 className="text-2xl font-bold text-black mb-6">
                   Requirements
                 </h2>
                 <div className="space-y-3">
@@ -496,7 +499,7 @@ export default function CourseDetailsPage({ params }) {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-gray-700">{requirement}</span>
+                        <span className="text-black">{requirement}</span>
                       </div>
                     ))
                   ) : (
@@ -521,9 +524,9 @@ export default function CourseDetailsPage({ params }) {
               </div>
 
               {/* Description */}
-              <div className="bg-white rounded-2xl shadow-lg border-2 border-emerald-100 p-8 hover:shadow-xl transition-all duration-300">
-                <h2 className="text-3xl font-bold text-emerald-800 mb-6 flex items-center">
-                  <svg className="w-8 h-8 mr-3 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+              <div className="bg-gray-300 rounded-2xl shadow-lg border-2 border-red-100 p-8 hover:shadow-xl transition-all duration-300">
+                <h2 className="text-3xl font-bold text-black mb-6 flex items-center">
+                  <svg className="w-8 h-8 mr-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   About this course
@@ -535,42 +538,42 @@ export default function CourseDetailsPage({ params }) {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-6 ">
               {/* Course Info Card */}
-              <div className="bg-white rounded-2xl shadow-xl border-2 border-teal-100 p-8 sticky top-6 hover:shadow-2xl transition-all duration-300">
-                <div className="text-4xl font-bold mb-6 bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+              <div className="bg-gray-800 rounded-2xl shadow-xl border-2 border-red-100 p-8 sticky top-6 hover:shadow-2xl transition-all duration-300">
+                <div className="text-4xl text-white font-bold mb-6 bg-gradient-to-r from-gray-700 to-gray-800 bg-clip-text ">
                   ₹{parseFloat(currentCourse.price).toLocaleString()}
                 </div>
 
-                <button className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-teal-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
+                <button className="w-full bg-gradient-to-r from-white to-gray-50 text-black py-4 rounded-xl font-bold text-lg hover:from-red-800 hover:to-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
                   Enroll Now
                 </button>
 
-                <button className="w-full border-2 border-teal-300 text-teal-700 py-3 rounded-xl font-semibold hover:bg-teal-50 hover:border-teal-400 transition-all duration-300 mb-6">
+                <button className="w-full border-2 bg-white border-red-300 text-black py-3 rounded-xl font-semibold hover:bg-red-50 hover:border-red-400 hover:text-black transition-all duration-300 mb-6">
                   Add to Wishlist
                 </button>
 
-                <div className="space-y-4">
+                <div className="space-y-4 text-white">
                   <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-gray-600">Level</span>
+                    <span className="text-blue-100">Level</span>
                     <span className="font-medium capitalize">
                       {currentCourse.level}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-gray-600">Language</span>
+                    <span className="text-blue-100">Language</span>
                     <span className="font-medium">
                       {currentCourse.language}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b">
-                    <span className="text-gray-600">Category</span>
+                    <span className="text-blue-100">Category</span>
                     <span className="font-medium">
                       {currentCourse.category}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-gray-600">Last Updated</span>
+                    <span className="text-blue-100">Last Updated</span>
                     <span className="font-medium">
                       {new Date(currentCourse.updated_at).toLocaleDateString()}
                     </span>

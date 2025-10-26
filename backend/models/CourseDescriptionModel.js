@@ -78,4 +78,22 @@ const getCourseDescription = async (courseId) => {
   }
 };
 
-module.exports = {createCourseDescription, getCourseDescription, getAllCourses};
+
+const getCoursesOfSeller = async(teacherId)=>{
+  try {
+    const sql = `SELECT * FROM courses where instructor_id = ?`;
+    const params = [teacherId];
+    const [result] = await db.execute(sql, params);
+    if(result.length > 0){
+      return result;
+    }else{
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+    
+}
+
+module.exports = {createCourseDescription, getCourseDescription, getAllCourses, getCoursesOfSeller};

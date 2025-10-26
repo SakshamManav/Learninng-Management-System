@@ -16,6 +16,7 @@ async function uploadVideoToCloud(req, res) {
       position,
       is_preview,
       resources,
+      course_id
     } = req.body;
 
     const { data, error } = await supabase.storage
@@ -41,6 +42,7 @@ async function uploadVideoToCloud(req, res) {
       position,
       is_preview,
       resources,
+      course_id,
       filename: file.originalname,
       mime_type: file.mimetype,
       size: file.size,
@@ -74,7 +76,7 @@ async function getSignedVideoUrl(req, res) {
     const hasAccess = false;
     const checkUserAccessresponse = await checkUserAccess(userId, course_id);
     if (!checkUserAccessresponse) {
-      res
+      return res
         .status(401)
         .json({ msg: "Unauthorized: You do not have access to this course." });
       hasAccess = true;
@@ -82,8 +84,9 @@ async function getSignedVideoUrl(req, res) {
 
     const videoCheckResponse = await getVideoInfo(video_id);
     if (!videoCheckResponse) {
-      res.status(400).json({ msg: "Video not available" });
+      return res.status(400).json({ msg: "Video not available" });
     }
+    console.log(videoCheckResponse)
     
     const { data, error } = await supabase.storage
       .from("videos")
@@ -92,7 +95,7 @@ async function getSignedVideoUrl(req, res) {
       // console.error(error)
     if (error) return res.status(500).send(error.message);
 
-    res.status(200).json({ url: data.signedUrl });
+    res.status(200).json({ url: data.signedUrl, details:videoCheckResponse });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

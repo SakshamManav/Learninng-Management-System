@@ -69,14 +69,49 @@ const getAllCourses = createAsyncThunk("course/getAllCourses", async () => {
     return result;
   })
 
+
+  const getASpecificVideo = createAsyncThunk('course/specificVideo', async({courseId, videoId})=>{
+    const response = await fetch(`${baseURL}/video/signed-url/${courseId}/${videoId}`, {
+      method:"GET",
+      headers:{
+       Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      }
+    })
+    if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    console.log(result)
+    return result;
+  })
+
+
+  const getAllCourseOfSeller = createAsyncThunk('course/sellerCourse', async(sellerId)=>{
+      const response = await fetch(`${baseURL}/teacher/${sellerId}`, {
+      method:"GET",
+      headers:{
+       Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      }
+    })
+     if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    console.log(result)
+    return result;
+  })
+
 const initialState = {
   courses: [],
   currentCourse: {}, // curent course 
   courseSection: [], // current course section
   courseVideoInfo:[],
+  currentVideoUrl:null,
+  currentVideoInfo:{},
   loading: false,
   error: null,
   isInitialized:false,
+  currentSellerCourse:[],
 };
 
 const courseSlice = createSlice({
@@ -101,8 +136,18 @@ const courseSlice = createSlice({
         }
       }
     },
-
-    
+    clearCurrentCourse: (state) => {
+      state.currentCourse = {};
+      state.courseSection = [];
+      state.courseVideoInfo = [];
+      state.error = null;
+      state.currentVideoUrl = null;
+      state.currentVideoInfo = {};
+      state.currentSellerCourse = [];
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -171,9 +216,37 @@ const courseSlice = createSlice({
         state.error = action.error.message;
       })
       
+      // get video url
+      .addCase(getASpecificVideo.pending, (state)=>{
+        state.loading = true;
+      })
+      .addCase(getASpecificVideo.fulfilled, (state,action)=>{
+        state.loading = false;
+        state.currentVideoUrl = action.payload.url;
+        state.currentVideoInfo = action.payload.details;
+      })
+      .addCase(getASpecificVideo.rejected, (state,action)=>{
+        state.loading = false;
+        state.error = action.error.message
+      })
+
+      // get all course oof url
+
+      .addCase(getAllCourseOfSeller.pending, (state)=>{
+        state.loading = true;
+        state.isInitialized = false;
+      })
+      .addCase(getAllCourseOfSeller.fulfilled, (state, action)=>{
+        state.currentSellerCourse = action.payload.course;
+        state.loading = false;
+      })
+      .addCase(getAllCourseOfSeller.rejected, (state,action)=>{
+        state.loading = false;
+        state.error = action.error.message;
+      })
   },
 });
 
-export { getAllCourses, getSpecificCourseById, getAllSectionsOfCourse, getAllVideosInfoOfACourse };
-export const {intiializeCourses} = courseSlice.actions;
+export { getAllCourses, getSpecificCourseById, getAllSectionsOfCourse, getAllVideosInfoOfACourse, getASpecificVideo, getAllCourseOfSeller };
+export const {intiializeCourses, clearCurrentCourse, clearError} = courseSlice.actions;
 export default courseSlice.reducer;

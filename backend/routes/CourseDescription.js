@@ -4,6 +4,7 @@ const {
   createCourseDescription,
   getCourseDescription,
   getAllCourses,
+  getCoursesOfSeller,
 } = require("../models/CourseDescriptionModel");
 const { authenticateRoutes } = require("../middleware/authentication");
 
@@ -57,6 +58,27 @@ router.get("/description/:id", authenticateRoutes, async (req, res) => {
         .json({ details: response, msg: "Details fetched successfully" });
     } else {
       res.status(400).json({ msg: "Unable to fetch details" });
+    }
+  } catch (error) {
+    res.status(500).json({ msg: "Some error occured", err: error.message });
+    console.error(error);
+  }
+});
+
+// get courses of a specific teacher or seller
+
+router.get("/teacher/:teacherId",authenticateRoutes, async (req, res) => {
+  const teacherId = req.params.teacherId;
+  try {
+    const response = await getCoursesOfSeller(teacherId);
+    if (response) {
+      return res
+        .status(200)
+        .json({ msg: "Fetched successfully", course: response });
+    } else {
+      return res
+        .status(400)
+        .json({ msg: "There are no course or some error occured" });
     }
   } catch (error) {
     res.status(500).json({ msg: "Some error occured", err: error.message });

@@ -18,7 +18,7 @@ async function storeVideoInfo(data) {
   try {
     const sql = `INSERT INTO course_video(section_id, course_id, title,video_url, duration, position, is_preview, resources, filename,
     mime_type,
-    size) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    size) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
       section_id,
       course_id,
@@ -44,7 +44,7 @@ async function storeVideoInfo(data) {
 
 async function getVideoInfo(videoId) {
   try {
-    const sql = `SELECT video_url, is_preview, section_id FROM course_video WHERE ID = ?`;
+    const sql = `SELECT video_url,title, is_preview, section_id FROM course_video WHERE ID = ?`;
     const params = [videoId];
     const [result] = await db.execute(sql, params);
     if (result.length > 0) {
@@ -62,13 +62,13 @@ async function getVideoInfo(videoId) {
 
 async function getAllVideosInfoOfCourse(courseId) {
   try {
-    const sql = `select * from course_video where course_id = ?`
-    const params  = [courseId];
+    const sql = `select * from course_video where course_id = ?`;
+    const params = [courseId];
 
     const [result] = await db.execute(sql, params);
-    if(result.length > 0){
+    if (result.length > 0) {
       return result;
-    }else{
+    } else {
       return null;
     }
   } catch (error) {

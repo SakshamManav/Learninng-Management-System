@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCourses, intiializeCourses } from "../redux/CourseSlice";
+import { getAllCourses, intiializeCourses, clearError } from "../redux/CourseSlice";
 
 import Link from "next/link";
 
@@ -14,6 +14,8 @@ export default function CustomerPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    // Clear any previous errors when returning to customer page
+    dispatch(clearError());
     dispatch(intiializeCourses());
   }, [dispatch]);
 
@@ -43,13 +45,13 @@ export default function CustomerPage() {
             {course.level || "All Levels"}
           </div>
           {/* Category badge */}
-          <div className="absolute bottom-3 left-3 bg-purple-600/90 text-white px-2 py-1 rounded text-xs font-medium">
+          <div className="absolute bottom-3 left-3 bg-red-700/90 text-white px-2 py-1 rounded text-xs font-medium">
             {course.category || "General"}
           </div>
         </div>
 
         <div className="p-6">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-red-700 transition-colors">
             {course.title}
           </h3>
 
@@ -82,7 +84,7 @@ export default function CustomerPage() {
                 ${course.price || "0"}
               </span>
             </div>
-            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+            <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors text-sm font-medium">
               Enroll Now
             </button>
           </div>
@@ -96,7 +98,7 @@ export default function CustomerPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
+      <section className="bg-gradient-to-r from-gray-700 to-gray-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -108,7 +110,7 @@ export default function CustomerPage() {
 
             {/* Course Count */}
             <div className="mb-6">
-              <p className="text-lg text-purple-100">
+              <p className="text-lg text-red-100">
                 {courses.length} courses available
               </p>
             </div>
@@ -120,9 +122,9 @@ export default function CustomerPage() {
                 placeholder="Search for courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-4 text-gray-900 rounded-full text-lg focus:outline-none focus:ring-4 focus:ring-white/30"
+                className="w-full px-6 py-4 text-gray-900 bg-white rounded-full text-lg focus:outline-none focus:ring-4 focus:ring-white/30"
               />
-              <button className="absolute right-2 top-2 bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition-colors">
+              <button className="absolute right-2 top-2 bg-red-700 text-white p-3 rounded-full hover:bg-red-800 transition-colors">
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -152,7 +154,7 @@ export default function CustomerPage() {
                 : "All Courses"}
             </h2>
 
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600">
               <option>Most Popular</option>
               <option>Highest Rated</option>
               <option>Newest</option>
@@ -164,7 +166,7 @@ export default function CustomerPage() {
           {/* Loading State */}
           {loading && (
             <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-700 mx-auto mb-4"></div>
               <p className="text-gray-600">Loading courses...</p>
             </div>
           )}
@@ -190,7 +192,7 @@ export default function CustomerPage() {
               <p className="text-gray-600 mb-4">Failed to load courses</p>
               <button
                 onClick={() => dispatch(getAllCourses())}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors"
               >
                 Try Again
               </button>
