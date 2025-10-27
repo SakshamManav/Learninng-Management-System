@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const {
+const { 
   uploadVideoToCloud,
   getSignedVideoUrl,
 } = require("../controllers/VideoUpload");

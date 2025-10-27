@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
 const {
   createCourseDescription,
   getCourseDescription,
@@ -7,7 +8,10 @@ const {
   getCoursesOfSeller,
 } = require("../models/CourseDescriptionModel");
 const { authenticateRoutes } = require("../middleware/authentication");
+const { uploadCourseImage } = require("../controllers/CourseImageHandling");
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 // get all courses
 
 router.get("/allcourses", authenticateRoutes, async (req, res) => {
@@ -28,9 +32,16 @@ router.get("/allcourses", authenticateRoutes, async (req, res) => {
 
 // posting sourcing description
 
-router.post("/description", authenticateRoutes, async (req, res) => {
+router.post("/description", authenticateRoutes, upload.single('thumbnail'), async (req, res) => {
+  
   const data = req.body;
   try {
+    
+    if(req.file){
+      const imageUrl = await uploadCourseImage(req.file);
+      data.thumbnail = imageUrl; // Add the public URL to your data
+    }
+
     const response = await createCourseDescription(data);
     if (response.affectedRows > 0) {
       res

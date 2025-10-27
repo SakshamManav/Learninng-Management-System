@@ -2,6 +2,7 @@ const db = require("../config/db");
 
 
 
+
 const getAllCourses = async (data) =>{
   try {
     const sql = ` SELECT 
@@ -35,10 +36,11 @@ const createCourseDescription = async (data) => {
     instructor_id,
     what_you_will_learn,
     requirements,
+    thumbnail
   } = data;
-
+ 
   try {
-    const sql = `INSERT INTO courses(title, description, category, level, price, language, instructor_id, what_you_will_learn, requirements) values(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO courses(title, description, category, level, price, language, instructor_id, what_you_will_learn, requirements, thumbnail) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
       title,
       description,
@@ -49,6 +51,7 @@ const createCourseDescription = async (data) => {
       instructor_id,
       what_you_will_learn,
       requirements,
+      thumbnail || null
     ];
     const [result] = await db.execute(sql, params);
     return result;

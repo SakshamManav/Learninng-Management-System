@@ -101,6 +101,27 @@ const getAllCourses = createAsyncThunk("course/getAllCourses", async () => {
     return result;
   })
 
+
+  const createCourseDescription = createAsyncThunk('course/createDescription', async(data)=>{
+   
+    const response = await fetch(`${baseURL}/description`, {
+      method:"POST",
+      headers:{
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+      },
+      body:data
+    })
+    
+
+    if(!response.ok){
+      throw new Error("Failed to fetch course details");
+    }
+    const result = await response.json();
+    console.log(result);
+    return result;
+  })
+
 const initialState = {
   courses: [],
   currentCourse: {}, // curent course 
@@ -108,10 +129,11 @@ const initialState = {
   courseVideoInfo:[],
   currentVideoUrl:null,
   currentVideoInfo:{},
+  currentSellerCourse:[],
   loading: false,
   error: null,
   isInitialized:false,
-  currentSellerCourse:[],
+  responseMsg:"",
 };
 
 const courseSlice = createSlice({
@@ -244,9 +266,21 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+
+      .addCase(createCourseDescription.pending, (state)=>{
+        state.loading = true;
+      })
+      .addCase(createCourseDescription.fulfilled, (state, action)=>{
+        state.loading = false;
+        state.responseMsg = action.payload.msg;
+      })
+      .addCase(createCourseDescription.rejected, (state,action)=>{
+        state.loading = false;
+        state.error = action.error.message;
+      })
   },
 });
 
-export { getAllCourses, getSpecificCourseById, getAllSectionsOfCourse, getAllVideosInfoOfACourse, getASpecificVideo, getAllCourseOfSeller };
+export { getAllCourses, getSpecificCourseById, getAllSectionsOfCourse, getAllVideosInfoOfACourse, getASpecificVideo, getAllCourseOfSeller, createCourseDescription };
 export const {intiializeCourses, clearCurrentCourse, clearError} = courseSlice.actions;
 export default courseSlice.reducer;
