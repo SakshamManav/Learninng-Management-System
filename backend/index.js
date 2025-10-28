@@ -9,8 +9,9 @@ dotenv.config();
 
 app.use(cors({ origin: "*" }));
 
-// Only use express.json() for routes that need JSON parsing
-// Remove the global express.json() middleware since it conflicts with multipart/form-data
+// Only using express.json() for routes that need JSON parsing
+
+
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/auth', express.json({ limit: '50mb' })); // Only for auth routes
 app.use('/course/allcourses', express.json({ limit: '50mb' })); // For GET routes that might need JSON

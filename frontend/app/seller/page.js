@@ -6,6 +6,7 @@ import {
   getAllCourseOfSeller,
   createCourseDescription,
 } from "../redux/CourseSlice";
+import Link from "next/link";
 
 export default function SellerHomepage() {
   const { currentSellerCourse, loading } = useSelector((state) => state.course);
@@ -133,7 +134,7 @@ export default function SellerHomepage() {
     if (courseData.thumbnail) {
       formData.append("thumbnail", courseData.thumbnail);
     }
-
+ 
     console.log("FormData prepared for submission",);
 
     const result = dispatch(createCourseDescription(formData));
@@ -165,7 +166,8 @@ export default function SellerHomepage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentSellerCourse.map((course) => (
-              <div
+              <Link
+              href={`/seller/course/${course.id}`}
                 key={course.id}
                 className="bg-white rounded-lg shadow-sm border overflow-hidden"
               >
@@ -231,7 +233,7 @@ export default function SellerHomepage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

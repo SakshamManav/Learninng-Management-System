@@ -3,6 +3,7 @@ const { getAllSectionOfCourse, createSectionOfCourse } = require("../models/Cour
 const { authenticateRoutes } = require("../middleware/authentication");
 
 const router = express.Router();
+router.use(express.json({ limit: '50mb' }));
 
 // get all section for a course
 
@@ -29,6 +30,7 @@ router.get("/section/:courseId", authenticateRoutes, async (req, res) => {
 
 router.post("/section", authenticateRoutes, async (req, res) => {
   const data = req.body;
+  console.log(data)
   try {
     const response = await createSectionOfCourse(data);
     if (response.affectedRows > 0) {

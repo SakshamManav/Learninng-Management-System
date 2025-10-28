@@ -93,10 +93,13 @@ async function getSignedVideoUrl(req, res) {
       .createSignedUrl(videoCheckResponse.video_url, 3600); // expires in 1 hour
 
       // console.error(error)
-    if (error) return res.status(500).send(error.message);
+    if (error){ 
+      console.error(error)
+      return res.status(500).send(error.message);}
 
     res.status(200).json({ url: data.signedUrl, details:videoCheckResponse });
   } catch (error) {
+    console.error(error)
     res.status(500).json({ error: error.message });
   }
 }
