@@ -165,7 +165,7 @@ const createCourseVideo = createAsyncThunk(
     const response = await fetch(`${baseURL}/video/upload`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("localToken")}`,
       },
       body: data,

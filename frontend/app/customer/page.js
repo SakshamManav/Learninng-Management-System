@@ -16,14 +16,14 @@ export default function CustomerPage() {
   useEffect(() => {
     // Clear any previous errors when returning to customer page
     dispatch(clearError());
-    dispatch(intiializeCourses());
+    dispatch(getAllCourses());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (isInitialized && (!courses || courses.length === 0)) {
-      dispatch(getAllCourses());
-    }
-  }, [dispatch, isInitialized, courses]);
+  // useEffect(() => {
+  //   if (isInitialized && (!courses || courses.length === 0)) {
+  //     dispatch(getAllCourses());
+  //   }
+  // }, [dispatch, isInitialized, courses]);
 
   // Filter courses based on search
   const filteredCourses = courses.filter(
@@ -33,7 +33,7 @@ export default function CustomerPage() {
   );
 
   const CourseCard = ({ course }) => (
-    <Link href={`/customer/course/${course.id}`}>
+    <Link href={`/customer/course/₹ {course.id}`}>
       <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
         <div className="relative h-48">
           <img
@@ -81,7 +81,7 @@ export default function CustomerPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="font-bold text-xl text-gray-900">
-                ${course.price || "0"}
+                ₹ {course.price || "0"}
               </span>
             </div>
             <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors text-sm font-medium">
@@ -150,7 +150,7 @@ export default function CustomerPage() {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
               {searchQuery
-                ? `Search Results (${filteredCourses.length})`
+                ? `Search Results (₹ {filteredCourses.length})`
                 : "All Courses"}
             </h2>
 
