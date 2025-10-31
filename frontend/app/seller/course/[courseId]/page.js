@@ -9,6 +9,7 @@ import {
   createCourseVideo,
 } from "@/app/redux/CourseSlice";
 import { useDispatch, useSelector } from "react-redux";
+import Navbar from "@/app/components/Navbar";
 
 export default function SellerCourse({ params }) {
   const unwrappedParams = use(params);
@@ -198,8 +199,9 @@ export default function SellerCourse({ params }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
+    <Navbar />
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-sky-600 to-sky-800 text-white">
+      <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex justify-between items-start">
             <div className="flex-1">
@@ -282,7 +284,7 @@ export default function SellerCourse({ params }) {
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Description Section */}
         {activeSection === "description" && (
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-gray-300 rounded-xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
                 Course Details
@@ -418,7 +420,7 @@ export default function SellerCourse({ params }) {
 
         {/* Sections Tab */}
         {activeSection === "sections" && (
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-gray-300 rounded-xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
                 Course Sections
@@ -449,7 +451,7 @@ export default function SellerCourse({ params }) {
                 courseSection.map((section, index) => (
                   <div
                     key={section.id}
-                    className="border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
+                    className="border bg-white  border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200"
                   >
                     {/* Section Header */}
                     <div className="p-6">
@@ -768,7 +770,7 @@ export default function SellerCourse({ params }) {
               activeSection
             )}
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {courseVideoInfo?.length > 0 ? (
                 courseVideoInfo.map((video, index) => (
                   <div
@@ -833,7 +835,7 @@ export default function SellerCourse({ params }) {
                   </p>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Add New Video Form */}
             {console.log("Rendering form check - showAddVideo:", showAddVideo)}

@@ -2,9 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from 'react-redux';
-import { initializeUser } from '../redux/UserSlice';
+import { initializeUser, userProfileInfo } from '../redux/UserSlice';
 import Link from 'next/link';
-// import img from 'next/img';
 
 export default function Navbar() {
   const [isClient, setIsClient] = useState(false);
@@ -14,7 +13,8 @@ export default function Navbar() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   
   const dispatch = useDispatch();
-  const {user} = useSelector((state)=>state.user);
+
+  const { user, profileInfo } = useSelector((state) => state.user);
   const profileDropdownRef = useRef(null);
   
   const {
@@ -27,9 +27,18 @@ export default function Navbar() {
   useEffect(() => {
     setIsClient(true);
     dispatch(initializeUser());
+    
+
+    if (localStorage.getItem('localToken')) {
+      const currentPath = window.location.pathname;
+    if (currentPath !== '/profile') {
+      dispatch(userProfileInfo());
+    }
+    }
   }, [dispatch]);
 
-  
+  const displayUser = profileInfo && Object.keys(profileInfo).length > 0 ? profileInfo : user;
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -118,7 +127,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-6 flex-shrink-0">
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center space-x-6">
-              {user.role === 'seller' ? (
+              {displayUser?.role === 'seller' ? (
                 <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                   Teach on EduPlatform
                 </button>
@@ -136,9 +145,9 @@ export default function Navbar() {
                   onClick={toggleProfileDropdown}
                   className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
-                  {user.profile_Picture ? (
+                  {displayUser?.profile_Picture ? (
                     <img 
-                      src={user.profile_Picture} 
+                      src={displayUser.profile_Picture} 
                       alt="Profile" 
                       width={40}
                       height={40}
@@ -158,9 +167,9 @@ export default function Navbar() {
                     <div className="px-4 py-3 border-b border-gray-100">
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
-                          {user.profile_Picture ? (
+                          {displayUser?.profile_Picture ? (
                             <img 
-                              src={user.profile_Picture} 
+                              src={displayUser.profile_Picture} 
                               alt="Profile" 
                               width={48}
                               height={48}
@@ -174,10 +183,13 @@ export default function Navbar() {
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-gray-900">
-                            {user.username || user.name || 'User'}
+                            {displayUser?.name || displayUser?.username || 'User'}
                           </p>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {user.role || 'Student'}
+                          <p className="text-xs text-gray-500">
+                            @{displayUser?.username || 'username'}
+                          </p>
+                          <p className="text-xs text-gray-400 capitalize">
+                            {displayUser?.role || 'Student'}
                           </p>
                         </div>
                       </div>
@@ -185,40 +197,26 @@ export default function Navbar() {
 
                     {/* User Details */}
                     <div className="px-4 py-3 space-y-2">
-                      {user.email && (
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                          <span className="text-sm text-gray-600">{user.email}</span>
-                        </div>
-                      )}
                       
-                      {user.contact && (
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                          </svg>
-                          <span className="text-sm text-gray-600">{user.contact}</span>
+                     
+
+                      {displayUser?.bio && (
+                        <div className="pt-2">
+                          <p className="text-xs text-gray-500 leading-relaxed">{displayUser.bio}</p>
                         </div>
                       )}
 
-                      {user.bio && (
-                        <div className="pt-2">
-                          <p className="text-xs text-gray-500 leading-relaxed">{user.bio}</p>
-                        </div>
-                      )}
+                      
                     </div>
 
                     {/* Menu Items */}
                     <div className="border-t border-gray-100">
-                      <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                      <Link href={'/profile'} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
                         <span>View Profile</span>
-                      </button>
+                      </Link>
                       
                       <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -312,7 +310,7 @@ export default function Navbar() {
               <Link href={`/course`} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded">
                 Courses
               </Link>
-              {user.role === 'seller' ? (
+              {displayUser?.role === 'seller' ? (
                 <button className="block w-full text-left px-3 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded">
                   Teach on EduPlatform
                 </button>
@@ -329,9 +327,9 @@ export default function Navbar() {
                     {/* Mobile Profile Info */}
                     <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded">
                       <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                        {user.profile_Picture ? (
+                        {displayUser?.profile_Picture ? (
                           <img 
-                            src={user.profile_Picture} 
+                            src={displayUser.profile_Picture} 
                             alt="Profile" 
                             width={40}
                             height={40}
@@ -345,10 +343,10 @@ export default function Navbar() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">
-                          {user.username || user.name || 'User'}
+                          {displayUser?.name || displayUser?.username || 'User'}
                         </p>
                         <p className="text-xs text-gray-500 capitalize">
-                          {user.role || 'Student'}
+                          {displayUser?.role || 'Student'}
                         </p>
                       </div>
                     </div>

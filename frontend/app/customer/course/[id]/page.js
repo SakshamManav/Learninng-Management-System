@@ -545,7 +545,7 @@ export default function CourseDetailsPage({ params }) {
                   ₹{parseFloat(currentCourse.price).toLocaleString()}
                 </div>
 
-                <button className="w-full bg-gradient-to-r from-white to-gray-50 text-black py-4 rounded-xl font-bold text-lg hover:from-red-800 hover:to-red-900 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
+                <button className="w-full bg-gradient-to-r from-white to-gray-50 text-black py-4 rounded-xl font-bold text-lg hover:from-green-400 hover:to-green-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
                   Enroll Now
                 </button>
 

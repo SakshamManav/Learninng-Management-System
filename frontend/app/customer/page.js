@@ -33,7 +33,7 @@ export default function CustomerPage() {
   );
 
   const CourseCard = ({ course }) => (
-    <Link href={`/customer/course/₹ {course.id}`}>
+    <Link href={`/customer/course/${course.id}`}>
       <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
         <div className="relative h-48">
           <img
@@ -84,7 +84,7 @@ export default function CustomerPage() {
                 ₹ {course.price || "0"}
               </span>
             </div>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors text-sm font-medium">
+            <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
               Enroll Now
             </button>
           </div>

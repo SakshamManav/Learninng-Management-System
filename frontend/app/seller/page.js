@@ -178,30 +178,22 @@ export default function SellerHomepage() {
                     alt={course.title}
                   />
                 </div>
-                <div className="p-6">
+                <div className="p-6 bg-gray-300">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-black">
                       {course.title}
                     </h3>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        course.status === "Published"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {course.status}
-                    </span>
+                    
                   </div>
 
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <div className="space-y-2 text-sm text-black">
                     <div className="flex justify-between">
                       <span>Level:</span>
                       <span className="font-medium">{course.level}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Price:</span>
-                      <span className="font-medium">${course.price}</span>
+                      <span className="font-medium"> ₹ {course.price}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Rating:</span>
@@ -224,14 +216,7 @@ export default function SellerHomepage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 flex space-x-2">
-                    <button className="flex-1 bg-red-700 text-white px-3 py-2 rounded text-sm hover:bg-red-800 transition-colors">
-                      Edit
-                    </button>
-                    <button className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-200 transition-colors">
-                      View
-                    </button>
-                  </div>
+                 
                 </div>
               </Link>
             ))}
@@ -239,12 +224,12 @@ export default function SellerHomepage() {
         </div>
 
         {/* Create New Course Section */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900">
+        <div className="bg-white rounded-lg shadow-sm border ">
+          <div className="px-6 py-4 border-b bg-gray-900 border-gray-200">
+            <h2 className="text-2xl font-semibold text-white">
               Create New Course
             </h2>
-            <p className="text-gray-600 mt-1">
+            <p className="text-white mt-1">
               Fill out the course details to create your new course
             </p>
           </div>
@@ -492,7 +477,7 @@ export default function SellerHomepage() {
                     className={`w-full px-6 py-3 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2 ${
                       loading
                         ? "bg-red-400 cursor-not-allowed"
-                        : "bg-red-700 hover:bg-red-800"
+                        : "bg-green-700 hover:bg-green-900"
                     } text-white`}
                   >
                     {loading && (
