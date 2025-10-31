@@ -25,7 +25,7 @@ app.use("/auth", require("./routes/Auth")); // user and authentcation
 app.use('/course', require('./routes/CourseDescription')) // course description
 app.use('/course', require('./routes/CourseSection')) // course sections route
 app.use('/course', require('./routes/CourseVideo')) // for course videos
-
+app.use('/course', require('./routes/Enrollment')) // for enrollment
 // middleware handle
 app.use((err, req, res, next) => {
   console.error("Error handler caught:", err);

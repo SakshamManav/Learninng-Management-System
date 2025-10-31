@@ -179,6 +179,61 @@ const createCourseVideo = createAsyncThunk(
     return result;
   }
 );
+
+// enroll a user to a course
+const enrollUser = createAsyncThunk(
+  "course/enroll",
+  async (courseId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${baseURL}/enrollment/enroll`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ courseId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(result.msg || "Enrollment failed");
+      }
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Check if user is enrolled in a course
+const checkUserEnrollmentToCourse = createAsyncThunk(
+  "course/checkEnroll",
+  async (courseId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${baseURL}/enrollment/${courseId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(result.msg || "Enrollment failed");
+      }
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   courses: [],
   currentCourse: {}, // curent course
@@ -191,6 +246,7 @@ const initialState = {
   error: null,
   isInitialized: false,
   responseMsg: "",
+  isEnrolled: false,
 };
 
 const courseSlice = createSlice({
@@ -366,6 +422,34 @@ const courseSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+
+      // enrollment
+
+      .addCase(enrollUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(enrollUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.responseMsg = action.payload.msg;
+      })
+      .addCase(enrollUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+
+      // check user enrollment
+
+      .addCase(checkUserEnrollmentToCourse.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkUserEnrollmentToCourse.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isEnrolled = action.payload.isEnrolled;
+      })
+      .addCase(checkUserEnrollmentToCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -378,7 +462,9 @@ export {
   getAllCourseOfSeller,
   createCourseDescription,
   createCourseSection,
-  createCourseVideo
+  createCourseVideo,
+  enrollUser,
+  checkUserEnrollmentToCourse,
 };
 export const { intiializeCourses, clearCurrentCourse, clearError } =
   courseSlice.actions;

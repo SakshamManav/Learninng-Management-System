@@ -16,6 +16,13 @@ async function signup_user(data) {
   } = data;
 
   try {
+    // Check if username already exists
+    const usernameExists = await checkUsernameExists(username);
+    if (usernameExists) {
+      throw new Error('USERNAME_EXISTS');
+    }
+
+
     const sql = `INSERT INTO user (username, name, email, role, provider, provider_Id, profile_Picture, bio, isVerified, contact, social_links)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
@@ -64,6 +71,17 @@ async function checkUserExists(email) {
     } else {
       return null;
     }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+// Check if username already exists
+async function checkUsernameExists(username) {
+  try {
+    const sql = `SELECT id, username FROM user WHERE username = ?`;
+    const [rows] = await db_pool.execute(sql, [username]);
+    return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     console.error(error);
     throw error;

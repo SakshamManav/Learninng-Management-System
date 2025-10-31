@@ -4,7 +4,9 @@ import {
   getSpecificCourseById,
   getAllSectionsOfCourse,
   getAllVideosInfoOfACourse,
-  clearCurrentCourse
+  clearCurrentCourse,
+  checkUserEnrollmentToCourse,
+  enrollUser
 } from "@/app/redux/CourseSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "@/app/components/Navbar";
@@ -14,16 +16,21 @@ export default function CourseDetailsPage({ params }) {
   const unwrappedParams = use(params);
   const courseId = unwrappedParams.id;
 
-  const { currentCourse, courseSection, loading, error, courseVideoInfo } = useSelector(
+  const { currentCourse, courseSection, loading, error, courseVideoInfo, isEnrolled } = useSelector(
     (state) => state.course
   );
+
+  const { user, profileInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   // State for managing which sections are expanded
   const [expandedSections, setExpandedSections] = useState({});
 
+
+  const userRole = profileInfo?.role || user?.role || 'guest';
+
   useEffect(() => {
-    // Clear previous course data when courseId changes
+ 
     dispatch(clearCurrentCourse());
     
     // Fetch new course data
@@ -33,12 +40,15 @@ export default function CourseDetailsPage({ params }) {
   }, [courseId, dispatch])
   
   useEffect(() => {
-    console.log('Current Course ID:', currentCourse?.id, 'URL Course ID:', parseInt(courseId));
-    console.log('Course Sections:', courseSection);
-    console.log('Course Videos:', courseVideoInfo);
-  }, [currentCourse, courseSection, courseVideoInfo, courseId]);
+    if(userRole === "customer"){
+      dispatch(checkUserEnrollmentToCourse(courseId));
+    }
+  }, [dispatch, userRole, courseId]);
 
-  // Toggle section expansion
+  useEffect(() => {
+    console.log(isEnrolled);
+  }, [isEnrolled]);
+
   const toggleSection = (sectionId) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -175,9 +185,24 @@ export default function CourseDetailsPage({ params }) {
                 <div className="text-3xl font-bold">
                   ₹{parseFloat(currentCourse.price).toLocaleString()}
                 </div>
-                <button className="bg-white text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-red-50 hover:text-gray-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-white/20">
-                  Enroll Now
-                </button>
+                {/* ✅ Conditional button based on user role */}
+                {userRole === 'customer' ? (
+                  <button className="bg-white text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-50 hover:text-green-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-white/20">
+                    Enroll Now
+                  </button>
+                ) : userRole === 'seller' ? (
+                  <div className="bg-white/20 text-white px-8 py-4 rounded-xl font-bold text-lg border-2 border-white/20 flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Preview Only</span>
+                  </div>
+                ) : (
+                  <button className="bg-gray-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-gray-400">
+                    Login to Enroll
+                  </button>
+                )}
               </div>
             </div>
 
@@ -241,194 +266,202 @@ export default function CourseDetailsPage({ params }) {
                       </button>
                     </div>
                   )}
-                </div>                  <div className="space-y-2">
-                    {courseSection && courseSection.length > 0 ? courseSection.map((section, index) => (
-                     
-                      <div
-                        key={section.id}
+                </div>
 
-                        className="border border-red-200 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300"
+                <div className="space-y-2">
+                  {courseSection && courseSection.length > 0 ? courseSection.map((section, index) => (
+                   
+                    <div
+                      key={section.id}
+                      className="border border-red-200 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-300"
+                    >
+                      {/* Section Header */}
+                      <button
+                        onClick={() => toggleSection(section.id)}
+                        className="w-full flex items-center justify-between p-5 text-left bg-gradient-to-r from-red-50 to-red-50 hover:from-red-100 hover:to-red-100 transition-all duration-300 rounded-t-xl border-b border-red-200"
                       >
-                        {/* Section Header */}
-                        <button
-                          onClick={() => toggleSection(section.id)}
-                          className="w-full flex items-center justify-between p-5 text-left bg-gradient-to-r from-red-50 to-red-50 hover:from-red-100 hover:to-red-100 transition-all duration-300 rounded-t-xl border-b border-red-200"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <span className="text-sm font-bold text-gray-900 min-w-[2rem] bg-red-100 px-2 py-1 rounded-md">
-                              {index + 1}.
-                            </span>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-800">
-                                {section.title || `Section ${index + 1}`}
-                              </h3>
-                              <p className="text-sm text-gray-500">
-                                {section.videos
-                                  ? `${section.videos.length} videos`
-                                  : "No videos"}
-                                {section.total_duration &&
-                                  ` • ${section.total_duration}`}
-                              </p>
-                            </div>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-sm font-bold text-gray-900 min-w-[2rem] bg-red-100 px-2 py-1 rounded-md">
+                            {index + 1}.
+                          </span>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {section.title || `Section ${index + 1}`}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {section.videos
+                                ? `${section.videos.length} videos`
+                                : "No videos"}
+                              {section.total_duration &&
+                                ` • ${section.total_duration}`}
+                            </p>
                           </div>
+                        </div>
 
-                          {/* Expand/Collapse Icon */}
-                          <svg
-                            className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${
-                              expandedSections[section.id] ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
+                        {/* Expand/Collapse Icon */}
+                        <svg
+                          className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${
+                            expandedSections[section.id] ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
 
-                        {/* Section Content (Videos) */}
-                        {expandedSections[section.id] && (
-                          <div className="border-t border-gray-200 bg-gray-50">
-                            {videosBySection[section.id] && videosBySection[section.id].length > 0 ? (
-                              <div className="p-4 space-y-3">
-                                {videosBySection[section.id].map((video, videoIndex) => (
-                                  
-                                  <div
-                                    key={video.id}
-                                    className="flex items-center space-x-4 p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200 cursor-pointer group"
-                                  >
-                                    {/* Video Thumbnail/Icon */}
-                                    <div className="flex-shrink-0 relative">
-                                      {video.mime_type && video.mime_type.startsWith('image/') ? (
-                                        // If it's an image (thumbnail)
-                                        <div className="w-16 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                                          <img 
-                                            src={`${process.env.NEXT_PUBLIC_API_URL}/${video.video_url}`}
-                                            alt={video.title}
-                                            className="w-full h-full object-cover"
-                                          />
-                                          {/* Play button overlay */}
-                                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                            </svg>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        // Video icon for actual video files
-                                        <div className="w-16 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                                          <svg className="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                      {/* Section Content (Videos) */}
+                      {expandedSections[section.id] && (
+                        <div className="border-t border-gray-200 bg-gray-50">
+                          {videosBySection[section.id] && videosBySection[section.id].length > 0 ? (
+                            <div className="p-4 space-y-3">
+                              {videosBySection[section.id].map((video, videoIndex) => (
+                                
+                                <div
+                                  key={video.id}
+                                  className="flex items-center space-x-4 p-4 bg-white rounded-lg border hover:shadow-md transition-all duration-200 cursor-pointer group"
+                                >
+                                  {/* Video Thumbnail/Icon */}
+                                  <div className="flex-shrink-0 relative">
+                                    {video.mime_type && video.mime_type.startsWith('image/') ? (
+                                      // If it's an image (thumbnail)
+                                      <div className="w-16 h-12 bg-gray-200 rounded-lg overflow-hidden">
+                                        <img 
+                                          src={`${process.env.NEXT_PUBLIC_API_URL}/${video.video_url}`}
+                                          alt={video.title}
+                                          className="w-full h-full object-cover"
+                                        />
+                                        {/* Play button overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                                           </svg>
                                         </div>
-                                      )}
-                                      
-                                      {/* Video number badge */}
-                                      <div className="absolute -top-2 -left-2 w-6 h-6 bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                                        {video.position || videoIndex + 1}
                                       </div>
+                                    ) : (
+                                      // Video icon for actual video files
+                                      <div className="w-16 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                        <svg className="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                    
+                                    {/* Video number badge */}
+                                    <div className="absolute -top-2 -left-2 w-6 h-6 bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                      {video.position || videoIndex + 1}
                                     </div>
+                                  </div>
 
-                                    {/* Video Info */}
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center space-x-2 mb-1">
+                                  {/* Video Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center space-x-2 mb-1">
+                                      {/* ✅ Conditional video link based on user role */}
+                                      
                                         <Link href={`/customer/course/${courseId}/video/${video.id}`} className="text-sm font-semibold text-gray-900 truncate group-hover:text-red-700 transition-colors">
                                           {video.title || `Video ${videoIndex + 1}`}
                                         </Link>
-                                        
-                                        {/* Preview badge */}
-                                        {video.is_preview && (
-                                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                                            Preview
-                                          </span>
-                                        )}
+                                      
+                                      
+                                      {/* Preview badge */}
+                                      {video.is_preview && (
+                                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                                          Preview
+                                        </span>
+                                      )}
+                                    </div>
+                                    
+                                   
+                                    
+                                    {/* Resources indicator */}
+                                    {video.resources && (
+                                      <div className="mt-1">
+                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                          📎 Resources Available
+                                        </span>
                                       </div>
-                                      
-                                     
-                                      
-                                      {/* Resources indicator */}
-                                      {video.resources && (
-                                        <div className="mt-1">
-                                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                            📎 Resources Available
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {/* Action buttons */}
-                                    <div className="flex-shrink-0 flex items-center space-x-2">
-                                      {video.is_preview ? (
-                                        <button className="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-700 transition-colors">
-                                          Watch Free
-                                        </button>
-                                      ) : (
-                                        <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                        </svg>
-                                      )}
-                                    </div>
+                                    )}
                                   </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="p-6 text-center text-gray-500">
-                                <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                                <p className="text-sm font-medium">No videos in this section yet</p>
-                                <p className="text-xs text-gray-400 mt-1">Videos will appear here once they are uploaded</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )) : (
-                      <div className="text-center py-12">
-                        <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 7a2 2 0 012-2h10a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Course Sections Yet</h3>
-                        <p className="text-gray-500 text-sm">This course does not have any sections or content uploaded yet.</p>
-                        <p className="text-gray-400 text-xs mt-1">Check back later for course content!</p>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Course Stats */}
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                          {courseSection ? courseSection.length : 0}
+                                  {/* Action buttons */}
+                                  <div className="flex-shrink-0 flex items-center space-x-2">
+                                    {video.is_preview ? (
+                                      <button className="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-green-700 transition-colors">
+                                        Watch Free
+                                      </button>
+                                    ) : userRole === 'customer' ? (
+                                      <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="p-6 text-center text-gray-500">
+                              <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                              <p className="text-sm font-medium">No videos in this section yet</p>
+                              <p className="text-xs text-gray-400 mt-1">Videos will appear here once they are uploaded</p>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-sm text-gray-500">Sections</div>
+                      )}
+                    </div>
+                  )) : (
+                    <div className="text-center py-12">
+                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 7a2 2 0 012-2h10a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      <h3 className="text-lg font-semibold text-gray-700 mb-2">No Course Sections Yet</h3>
+                      <p className="text-gray-500 text-sm">This course does not have any sections or content uploaded yet.</p>
+                      <p className="text-gray-400 text-xs mt-1">Check back later for course content!</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Course Stats */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {courseSection ? courseSection.length : 0}
                       </div>
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                          {courseVideoInfo ? courseVideoInfo.length : 0}
-                        </div>
-                        <div className="text-sm text-gray-500">Videos</div>
+                      <div className="text-sm text-gray-500">Sections</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {courseVideoInfo ? courseVideoInfo.length : 0}
                       </div>
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                          {currentCourse.level || "All"}
-                        </div>
-                        <div className="text-sm text-gray-500">Level</div>
+                      <div className="text-sm text-gray-500">Videos</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {currentCourse.level || "All"}
                       </div>
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                          {currentCourse.language || "N/A"}
-                        </div>
-                        <div className="text-sm text-gray-500">Language</div>
+                      <div className="text-sm text-gray-500">Level</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {currentCourse.language || "N/A"}
                       </div>
+                      <div className="text-sm text-gray-500">Language</div>
                     </div>
                   </div>
                 </div>
+              </div>
 
               {/* What You'll Learn */}
               <div className="bg-gray-300 rounded-2xl shadow-lg border-2 border-red-100 p-8 hover:shadow-xl transition-all duration-300">
@@ -495,7 +528,7 @@ export default function CourseDetailsPage({ params }) {
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.914L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -545,13 +578,45 @@ export default function CourseDetailsPage({ params }) {
                   ₹{parseFloat(currentCourse.price).toLocaleString()}
                 </div>
 
-                <button className="w-full bg-gradient-to-r from-white to-gray-50 text-black py-4 rounded-xl font-bold text-lg hover:from-green-400 hover:to-green-500 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
-                  Enroll Now
-                </button>
+                {/* ✅ Conditional sidebar buttons based on user role */}
+                {userRole === 'customer' ? (
+                  <>
+                    <button className="w-full bg-gradient-to-r from-white to-gray-50 text-black py-4 rounded-xl font-bold text-lg hover:from-green-400 hover:to-green-500 hover:text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
+                      Enroll Now
+                    </button>
 
-                <button className="w-full border-2 bg-white border-red-300 text-black py-3 rounded-xl font-semibold hover:bg-red-50 hover:border-red-400 hover:text-black transition-all duration-300 mb-6">
-                  Add to Wishlist
-                </button>
+                    <button className="w-full border-2 bg-white border-red-300 text-black py-3 rounded-xl font-semibold hover:bg-red-50 hover:border-red-400 hover:text-black transition-all duration-300 mb-6">
+                      Add to Wishlist
+                    </button>
+                  </>
+                ) : userRole === 'seller' ? (
+                  <>
+                    <div className="w-full bg-gray-700 text-gray-300 py-4 rounded-xl font-bold text-lg mb-4 text-center border-2 border-gray-600 flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span>Preview Mode</span>
+                    </div>
+
+                    <div className="w-full bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold mb-6 text-center border-2 border-gray-600 flex items-center justify-center space-x-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                      </svg>
+                      <span>Instructors cannot enroll</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <button className="w-full bg-gray-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl mb-4">
+                      Login to Enroll
+                    </button>
+
+                    <button className="w-full border-2 bg-gray-100 border-gray-300 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-300 mb-6">
+                      Login to Add to Wishlist
+                    </button>
+                  </>
+                )}
 
                 <div className="space-y-4 text-white">
                   <div className="flex items-center justify-between py-2 border-b">

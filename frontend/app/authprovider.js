@@ -5,13 +5,12 @@ import React from "react";
 export function Auth0ProviderClient({ children }) {
   return (
     <Auth0Provider
-      domain="dev-5t7vf2fdg1cniw67.us.auth0.com"
-      clientId="oCZv8oI3fet1rCgpxNgZ2g5Wsa6RMQpr"
+      domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
+      clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
       authorizationParams={{
-        redirect_uri: "http://localhost:3000/",
-        audience: "https://learningmanagementsystem-api",
-            scope: "openid profile email"
-
+        redirect_uri: process.env.NEXT_PUBLIC_AUTH0_REDIRECT_URI,
+        audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,
+        scope: "openid profile email"
       }}
     >
       {children}

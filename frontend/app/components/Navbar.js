@@ -86,17 +86,17 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-black shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
           {/* Left side - Logo and Categories */}
           <div className="flex items-center space-x-8 flex-shrink-0">
             <Link className="flex items-center" href={'/'}>
-              <img src='/logo2.png' alt='eduKnow' className='h-[200px] w-[200px]' />
+              <img src='/logo4.png' alt='eduKnow' className='h-[200px] w-[200px]' />
             </Link>
             <div className="hidden lg:block">
-              <Link href={`/customer`} className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+              <Link href={`/customer`} className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                 Course
               </Link>
             </div>
@@ -128,11 +128,11 @@ export default function Navbar() {
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center space-x-6">
               {displayUser?.role === 'seller' ? (
-                <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+                <button className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                   Teach on EduPlatform
                 </button>
               ) : (
-                <button className="text-gray-700 hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+                <button className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                   My learning
                 </button>
               )}
@@ -162,7 +162,7 @@ export default function Navbar() {
 
                 {/* Profile Dropdown */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-80 bg-gray-200 rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     {/* User Info Section */}
                     <div className="px-4 py-3 border-b border-gray-100">
                       <div className="flex items-center space-x-3">
@@ -250,17 +250,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-3">
+               
                 <button
-                  className="px-4 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                   onClick={handle_login}
                 >
-                  Log In
-                </button>
-                <button
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                  onClick={handle_login}
-                >
-                  Sign Up
+                  Login
                 </button>
               </div>
             )}

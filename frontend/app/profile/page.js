@@ -116,6 +116,62 @@ export default function Profile() {
   const handleImageUpload = async (file) => {
     try {
       setIsImageUploading(true);
+      setUpdateMessage('');
+      setUpdateType('');
+
+      // ✅ Enhanced Image Validation
+      
+      // 1. Check if file exists
+      if (!file) {
+        setUpdateMessage('Please select a file');
+        setUpdateType('error');
+        return;
+      }
+
+      // 2. Check file type - Only allow specific image formats
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type.toLowerCase())) {
+        setUpdateMessage('Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image only.');
+        setUpdateType('error');
+        return;
+      }
+
+      // 3. Additional MIME type validation using file extension
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+      const fileName = file.name.toLowerCase();
+      const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+      
+      if (!hasValidExtension) {
+        setUpdateMessage('Invalid file extension. Please upload an image file (.jpg, .jpeg, .png, .gif, .webp)');
+        setUpdateType('error');
+        return;
+      }
+
+      // 4. Check file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        setUpdateMessage('Image size must be less than 5MB. Please choose a smaller image.');
+        setUpdateType('error');
+        return;
+      }
+
+      // 5. Minimum file size check (to avoid empty/corrupt files)
+      const minSize = 1024; // 1KB minimum
+      if (file.size < minSize) {
+        setUpdateMessage('Image file is too small. Please select a valid image.');
+        setUpdateType('error');
+        return;
+      }
+
+      // 6. Additional validation: Check if it's actually an image by reading file header
+      const isValidImage = await validateImageFile(file);
+      if (!isValidImage) {
+        setUpdateMessage('Invalid image file. Please select a valid image.');
+        setUpdateType('error');
+        return;
+      }
+
+      // 7. If all validations pass, proceed with upload
       const formData = new FormData();
       formData.append('image', file);
       
@@ -133,12 +189,12 @@ export default function Profile() {
           setUpdateType('');
         }, 3000);
       } else {
-        setUpdateMessage('Failed to update profile image');
+        setUpdateMessage('Failed to update profile image. Please try again.');
         setUpdateType('error');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      setUpdateMessage('Error uploading image');
+      setUpdateMessage('Error uploading image. Please try again.');
       setUpdateType('error');
     } finally {
       setIsImageUploading(false);
@@ -185,6 +241,55 @@ export default function Profile() {
       github: 'text-gray-800'
     };
     return colors[platform] || 'text-gray-600';
+  };
+
+  // ✅ Helper function to validate image file by reading file header
+  const validateImageFile = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const header = new Uint8Array(e.target.result).subarray(0, 4);
+        let isValid = false;
+        
+        // Check file signatures (magic numbers) for common image formats
+        const headerHex = Array.from(header).map(byte => byte.toString(16).padStart(2, '0')).join('');
+        
+        // JPEG: FF D8 FF
+        if (headerHex.startsWith('ffd8ff')) {
+          isValid = true;
+        }
+        // PNG: 89 50 4E 47
+        else if (headerHex.startsWith('89504e47')) {
+          isValid = true;
+        }
+        // GIF: 47 49 46 38
+        else if (headerHex.startsWith('47494638')) {
+          isValid = true;
+        }
+        // WebP: 52 49 46 46 (RIFF)
+        else if (headerHex.startsWith('52494646')) {
+          // For WebP, we need to check further bytes
+          const reader2 = new FileReader();
+          reader2.onload = function(e2) {
+            const fullHeader = new Uint8Array(e2.target.result).subarray(0, 12);
+            const fullHex = Array.from(fullHeader).map(byte => byte.toString(16).padStart(2, '0')).join('');
+            // Check for WebP signature: RIFF....WEBP
+            if (fullHex.includes('57454250')) { // 'WEBP' in hex
+              isValid = true;
+            }
+            resolve(isValid);
+          };
+          reader2.readAsArrayBuffer(file.slice(0, 12));
+          return;
+        }
+        
+        resolve(isValid);
+      };
+      
+      reader.onerror = () => resolve(false);
+      reader.readAsArrayBuffer(file.slice(0, 4));
+    });
   };
 
   if (loading) {
@@ -684,18 +789,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Additional Actions */}
-        <div className="mt-8 flex justify-center">
-          <div className="bg-white rounded-xl shadow-lg p-6 flex flex-wrap gap-4 justify-center">
-            <button className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Change Password
-            </button>
-           
-          </div>
-        </div>
+        
       </div>
     </div>
     

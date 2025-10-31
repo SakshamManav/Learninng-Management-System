@@ -24,6 +24,7 @@ const signupUser = createAsyncThunk("user/signup", async ({ data, token }) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      name:data.name,
       username: data.username,
       email: data.email,
       role: data.role,

@@ -2,30 +2,42 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCourses, intiializeCourses, clearError } from "../redux/CourseSlice";
+import {
+  getAllCourses,
+  intiializeCourses,
+  clearError,
+  checkUserEnrollmentToCourse,
+  enrollUser,
+} from "../redux/CourseSlice";
 
 import Link from "next/link";
 
 export default function CustomerPage() {
-  const { courses, loading, error, isInitialized } = useSelector(
+  const { courses, loading, error, isInitialized, isEnrolled } = useSelector(
     (state) => state.course
   );
+
+  const { user, profileInfo } = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const userRole = profileInfo?.role || user?.role || "customer";
+
   useEffect(() => {
-    // Clear any previous errors when returning to customer page
+    // console.log(profileInfo)
+    console.log("User data:", user);
+    console.log("Profile info:", profileInfo);
+    console.log("Detected role:", userRole);
+  }, [user, profileInfo, userRole]);
+
+  useEffect(() => {
+    // console.log(userRole)
     dispatch(clearError());
     dispatch(getAllCourses());
-  }, [dispatch]);
+  }, [dispatch, userRole]);
 
-  // useEffect(() => {
-  //   if (isInitialized && (!courses || courses.length === 0)) {
-  //     dispatch(getAllCourses());
-  //   }
-  // }, [dispatch, isInitialized, courses]);
-
-  // Filter courses based on search
+  
   const filteredCourses = courses.filter(
     (course) =>
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -84,9 +96,49 @@ export default function CustomerPage() {
                 ₹ {course.price || "0"}
               </span>
             </div>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
-              Enroll Now
-            </button>
+
+            {(() => {
+              console.log("Rendering button for role:", userRole); // Debug log
+
+              if (userRole === "seller") {
+                return (
+                  <div className="flex items-center text-gray-500 text-sm">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                    Preview Only
+                  </div>
+                );
+              } else if (userRole === "customer") {
+                return (
+                  <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
+                    Enroll Now
+                  </button>
+                );
+              } else {
+                return (
+                  <button className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+                    Login to Enroll
+                  </button>
+                );
+              }
+            })()}
           </div>
         </div>
       </div>
@@ -97,25 +149,30 @@ export default function CustomerPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-gray-700 to-gray-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Discover Your Next Course
+              {userRole === "seller"
+                ? "Browse Courses"
+                : userRole === "customer"
+                ? "Discover Your Next Course"
+                : "Welcome to Our Platform"}
             </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Explore courses and start learning today
+              {userRole === "seller"
+                ? "Explore courses and get inspiration for your next creation"
+                : userRole === "customer"
+                ? "Explore courses and start learning today"
+                : "Please log in to access all features"}
             </p>
 
-            {/* Course Count */}
             <div className="mb-6">
               <p className="text-lg text-red-100">
                 {courses.length} courses available
               </p>
             </div>
 
-            {/* Search Bar */}
             <div className="max-w-2xl mx-auto relative">
               <input
                 type="text"
@@ -144,13 +201,12 @@ export default function CustomerPage() {
         </div>
       </section>
 
-      {/* Courses Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
               {searchQuery
-                ? `Search Results (₹ {filteredCourses.length})`
+                ? `Search Results (${filteredCourses.length})`
                 : "All Courses"}
             </h2>
 
@@ -163,7 +219,6 @@ export default function CustomerPage() {
             </select>
           </div>
 
-          {/* Loading State */}
           {loading && (
             <div className="text-center py-16">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-700 mx-auto mb-4"></div>
@@ -171,7 +226,6 @@ export default function CustomerPage() {
             </div>
           )}
 
-          {/* Error State */}
           {error && (
             <div className="text-center py-16">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -201,7 +255,7 @@ export default function CustomerPage() {
 
           {/* Courses Grid */}
           {!loading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCourses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))}

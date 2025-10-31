@@ -11,6 +11,7 @@ export default function ProfileComplete() {
   const isLoggedin = useSelector((state) => state.user.isLoggedin);
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [form, setForm] = useState({
+    name: "", // ✅ Added name field
     username: "",
     role: "customer",
     contact: "",
@@ -34,6 +35,16 @@ export default function ProfileComplete() {
     setToken();
   }, [isAuthenticated, isLoading, getAccessTokenSilently]);
 
+  // ✅ Auto-populate name from Auth0 user data
+  useEffect(() => {
+    if (user?.name && !form.name) {
+      setForm(prev => ({
+        ...prev,
+        name: user.name
+      }));
+    }
+  }, [user, form.name]);
+
   useEffect(() => {
     if (localStorage.getItem('localToken')) {
       router.push("/");
@@ -42,6 +53,16 @@ export default function ProfileComplete() {
 
   function validateForm() {
     const newErrors = {};
+    
+    // ✅ Name validation
+    if (!form.name.trim()) {
+      newErrors.name = "Name is required.";
+    } else if (form.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters.";
+    } else if (form.name.trim().length > 50) {
+      newErrors.name = "Name must be less than 50 characters.";
+    }
+    
     if (form.username.length < 7 || form.username.length > 20) {
       newErrors.username = "Username must be 7-20 characters.";
     }
@@ -71,6 +92,7 @@ export default function ProfileComplete() {
         }
         const formData = {
           ...form,
+          name: form.name.trim(), // ✅ Trim whitespace
           provider,
           provider_Id,
           email: user?.email || "",
@@ -136,6 +158,39 @@ export default function ProfileComplete() {
           </div>
 
           <form className="space-y-6" onSubmit={handleFormSubmit}>
+            {/* ✅ Name Field - Added first */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Full Name *
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all ${
+                    errors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 focus:border-teal-300'
+                  }`}
+                  placeholder="Enter your full name"
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.name}
+                </p>
+              )}
+            </div>
+
             {/* Username Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">

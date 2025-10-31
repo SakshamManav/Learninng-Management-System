@@ -11,11 +11,11 @@ const { userProfileImage } = require("../controllers/CourseImageHandling");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-// ----TODO----------
-//  i am not sending user id when signup the user in payload using middleware but in login it has done
+
+
 router.post("/signup", authenticate, async (req, res) => {
   const data = req.body;
-
+  console.log(data)
   try {
     const result = await signup_user(data);
     const payload = {
@@ -27,6 +27,8 @@ router.post("/signup", authenticate, async (req, res) => {
       contact: data.contact,
     };
     if (result.affectedRows > 0) {
+      const userId = result.insertId;
+      payload.id = userId;
       const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
       res.status(201).json({
         msg: "User created successfully",
@@ -40,6 +42,12 @@ router.post("/signup", authenticate, async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ msg: "Some error occured", err: error });
+    if (error.message === 'USERNAME_EXISTS') {
+      return res.status(400).json({ 
+        msg: "Username already exists. Please choose another username.",
+        error: "USERNAME_EXISTS"
+      });
+    }
   }
 });
 
