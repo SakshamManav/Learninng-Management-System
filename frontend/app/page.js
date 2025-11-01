@@ -54,32 +54,32 @@ export default function Home() {
 
             {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-4xl mx-auto">
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
+              <div className="bg-gray-200 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
                 <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-r from-red-700 to-red-800 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Expert-Led Courses</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">Expert-Led Courses</h3>
                 <p className="text-gray-600">Learn from industry professionals and top educators worldwide</p>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
+              <div className="bg-gray-200 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
                 <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-r from-red-700 to-red-800 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Flexible Learning</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">Flexible Learning</h3>
                 <p className="text-gray-600">Study at your own pace, anywhere, anytime with lifetime access</p>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
+              <div className="bg-gray-200 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20">
                 <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-r from-red-700 to-red-800 rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Career Growth</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">Career Growth</h3>
                 <p className="text-gray-600">Advance your career with in-demand skills and certifications</p>
               </div>
             </div>
@@ -103,7 +103,7 @@ export default function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                       </svg>
                     </div>
-                    <h4 className="text-2xl font-bold mb-4">I Want to Learn</h4>
+                    <h4 className="text-2xl font-bold mb-4">I Want to Learn ( Student )</h4>
                     <p className="text-lg text-red-100 mb-6">
                       Discover thousands of courses across various subjects. 
                       Start your learning journey today and unlock new opportunities.
@@ -127,7 +127,7 @@ export default function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <h4 className="text-2xl font-bold mb-4">I Want to Teach</h4>
+                    <h4 className="text-2xl font-bold mb-4">I Want to Teach ( Teacher )</h4>
                     <p className="text-lg text-gray-100 mb-6">
                       Share your expertise with millions of students worldwide. 
                       Create courses and build your teaching business.

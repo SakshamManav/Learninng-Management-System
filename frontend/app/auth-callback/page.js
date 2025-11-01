@@ -61,32 +61,56 @@ export default function AuthCallback() {
   }, [isAuthenticated, isLoading, user, dispatch, router, getAccessTokenSilently]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-900">
-      <div className="loader"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-300">
+      <div className="flex flex-col items-center space-y-2">
+        {/* Triangle */}
+        <div className="triangle-loader"></div>
+        {/* Square & Circle */}
+        <div className="flex flex-row space-x-4">
+          <div className="square-loader"></div>
+          <div className="circle-loader"></div>
+        </div>
+      </div>
       <style jsx>{`
-        .loader {
-          width: 80px;
+        .triangle-loader {
+          width: 0;
+          height: 0;
+          
+          border-left: 28px solid transparent;
+          border-right: 28px solid transparent;
+          border-bottom: 48px solid #FFD600;
+          animation: triangle-bounce 1.5s infinite cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        .square-loader {
+          width: 40px;
           height: 40px;
-          border-radius: 100px 100px 0 0;
-          position: relative;
-          overflow: hidden;
+          background: #0c3d82;
+          border-radius: 8px;
+          animation: square-bounce 1.5s infinite cubic-bezier(.68,-0.55,.27,1.55);
+          animation-delay: 0.3s;
         }
-        .loader:before {
-          content: "";
-          position: absolute;
-          inset: 0 0 -100%;
-          background: 
-            radial-gradient(farthest-side,#ffd738 80%,#0000) left 70% top    20%/15px 15px,
-            radial-gradient(farthest-side,#020308 92%,#0000) left 65% bottom 19%/12px 12px,
-            radial-gradient(farthest-side,#ecfefe 92%,#0000) left 70% bottom 20%/15px 15px,
-            linear-gradient(#9eddfe 50%,#020308 0);
-          background-repeat: no-repeat;
-          animation: l5 2s infinite;
+        .circle-loader {
+          width: 40px;
+          height: 40px;
+          background: #0c3d82;
+          border-radius: 50%;
+          animation: circle-bounce 1.5s infinite cubic-bezier(.68,-0.55,.27,1.55);
+          animation-delay: 0.6s;
         }
-        @keyframes l5 {
-          0%,20%   {transform: rotate(0)}
-          40%,60%  {transform: rotate(.5turn)}
-          80%,100% {transform: rotate(1turn)}
+        @keyframes triangle-bounce {
+          0%, 100% { transform: translateY(0);}
+          20% { transform: translateY(-18px);}
+          40%, 80% { transform: translateY(0);}
+        }
+        @keyframes square-bounce {
+          0%, 100% { transform: translateY(0);}
+          20% { transform: translateY(-18px);}
+          40%, 80% { transform: translateY(0);}
+        }
+        @keyframes circle-bounce {
+          0%, 100% { transform: translateY(0);}
+          20% { transform: translateY(-18px);}
+          40%, 80% { transform: translateY(0);}
         }
       `}</style>
     </div>

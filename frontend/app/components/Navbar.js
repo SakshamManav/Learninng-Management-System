@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeUser, userProfileInfo } from '../redux/UserSlice';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [isClient, setIsClient] = useState(false);
@@ -93,7 +94,7 @@ export default function Navbar() {
           {/* Left side - Logo and Categories */}
           <div className="flex items-center space-x-8 flex-shrink-0">
             <Link className="flex items-center" href={'/'}>
-              <img src='/logo4.png' alt='eduKnow' className='h-[200px] w-[200px]' />
+              <Image width={100} height={100} src='/logo4.png' alt='eduKnow' className='h-[200px] w-[200px]' />
             </Link>
             <div className="hidden lg:block">
               <Link href={`/customer`} className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
@@ -128,25 +129,25 @@ export default function Navbar() {
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center space-x-6">
               {displayUser?.role === 'seller' ? (
-                <button className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
-                  Teach on EduPlatform
-                </button>
+                <Link  href={`/seller`} className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+                  Teach on eduKnow
+                </Link>
               ) : (
-                <button className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
+                <Link href={`/customer/my-enrollments`} className="text-white hover:text-purple-600 px-3 py-2 transition-colors font-medium">
                   My learning
-                </button>
+                </Link>
               )}
             </div>
 
-            {/* Authentication */}
+
             {isClient && localStorage.getItem('localToken') ? (
               <div className="relative" ref={profileDropdownRef}>
                 <button
                   onClick={toggleProfileDropdown}
-                  className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
                   {displayUser?.profile_Picture ? (
-                    <img 
+                    <Image 
                       src={displayUser.profile_Picture} 
                       alt="Profile" 
                       width={40}
@@ -160,7 +161,7 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Profile Dropdown */}
+            
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-80 bg-gray-200 rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     {/* User Info Section */}
@@ -168,7 +169,7 @@ export default function Navbar() {
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
                           {displayUser?.profile_Picture ? (
-                            <img 
+                            <Image 
                               src={displayUser.profile_Picture} 
                               alt="Profile" 
                               width={48}
@@ -323,7 +324,7 @@ export default function Navbar() {
                     <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded">
                       <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                         {displayUser?.profile_Picture ? (
-                          <img 
+                          <Image 
                             src={displayUser.profile_Picture} 
                             alt="Profile" 
                             width={40}

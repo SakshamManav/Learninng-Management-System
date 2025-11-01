@@ -38,41 +38,9 @@ router.post("/enrollment/enroll", authenticateRoutes, async (req, res) => {
   }
 });
 
-//  Check if user is enrolled in a course
-router.get("/enrollment/:courseId", authenticateRoutes, async (req, res) => {
-  const courseId = req.params.courseId;
-  const userId = req.user.id;
-
-  try {
-    const sql = `SELECT * FROM enrollment WHERE course_id = ? AND user_id = ?`;
-    const params = [courseId, userId];
-    const [result] = await db.execute(sql, params);
-    
-    if (result.length > 0) {
-      res.status(200).json({ 
-        msg: "User is enrolled",
-        isEnrolled: true,
-        enrollment: result[0] 
-      });
-    } else {
-      res.status(200).json({
-        msg: "User is not enrolled",
-        isEnrolled: false
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      msg: "Some error occurred",
-      err: error.message,
-    });
-  }
-});
-
-
 // Get all enrollments for a user
 
-router.get("/enrollments/user", authenticateRoutes, async (req, res) => {
+router.get("/enrollment/user", authenticateRoutes, async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -112,9 +80,43 @@ router.get("/enrollments/user", authenticateRoutes, async (req, res) => {
 });
 
 
+//  Check if user is enrolled in a course
+router.get("/enrollment/course/:courseId", authenticateRoutes, async (req, res) => {
+  const courseId = req.params.courseId;
+  const userId = req.user.id;
+
+  try {
+    const sql = `SELECT * FROM enrollment WHERE course_id = ? AND user_id = ?`;
+    const params = [courseId, userId];
+    const [result] = await db.execute(sql, params);
+    
+    if (result.length > 0) {
+      res.status(200).json({ 
+        msg: "User is enrolled",
+        isEnrolled: true,
+        enrollment: result[0] 
+      });
+    } else {
+      res.status(200).json({
+        msg: "User is not enrolled",
+        isEnrolled: false
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: "Some error occurred",
+      err: error.message,
+    });
+  }
+});
+
+
+
+
 // Unenroll from a course
 
-router.delete("/enrollment/:courseId", authenticateRoutes, async (req, res) => {
+router.delete("/enrollment/course/:courseId", authenticateRoutes, async (req, res) => {
   const courseId = req.params.courseId;
   const userId = req.user.id;
 

@@ -213,7 +213,7 @@ const checkUserEnrollmentToCourse = createAsyncThunk(
   "course/checkEnroll",
   async (courseId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${baseURL}/enrollment/${courseId}`, {
+      const response = await fetch(`${baseURL}/enrollment/course/${courseId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("localToken")}`,
@@ -234,6 +234,30 @@ const checkUserEnrollmentToCourse = createAsyncThunk(
   }
 );
 
+const getAllUserEnrolledCourse = createAsyncThunk('/user/userCourseEnrolled', async(_, { rejectWithValue })=>{
+  console.log("heireiu")
+   try {
+      const response = await fetch(`${baseURL}/enrollment/user`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("localToken")}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(result.msg || "Enrollment failed");
+      }
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+})
+
+
 const initialState = {
   courses: [],
   currentCourse: {}, // curent course
@@ -242,6 +266,7 @@ const initialState = {
   currentVideoUrl: null,
   currentVideoInfo: {},
   currentSellerCourse: [],
+  userCurrentEnrolledCourse:[],
   loading: false,
   error: null,
   isInitialized: false,
@@ -449,7 +474,21 @@ const courseSlice = createSlice({
       .addCase(checkUserEnrollmentToCourse.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      });
+      })
+
+      // current enrolled courses of user
+
+      .addCase(getAllUserEnrolledCourse.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllUserEnrolledCourse.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userCurrentEnrolledCourse = action.payload.enrollments;
+      })
+      .addCase(getAllUserEnrolledCourse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
   },
 });
 
@@ -465,6 +504,7 @@ export {
   createCourseVideo,
   enrollUser,
   checkUserEnrollmentToCourse,
+  getAllUserEnrolledCourse
 };
 export const { intiializeCourses, clearCurrentCourse, clearError } =
   courseSlice.actions;

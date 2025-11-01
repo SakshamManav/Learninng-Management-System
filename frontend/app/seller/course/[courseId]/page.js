@@ -10,6 +10,7 @@ import {
 } from "@/app/redux/CourseSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "@/app/components/Navbar";
+import Image from "next/image";
 
 export default function SellerCourse({ params }) {
   const unwrappedParams = use(params);
@@ -98,7 +99,7 @@ export default function SellerCourse({ params }) {
     };
     console.log("New section with course_id:", sectionData);
     console.log("CourseId from URL:", courseId);
-    
+
     // Just dispatch - don't reset form here
     dispatch(createCourseSection(sectionData));
   };
@@ -199,7 +200,7 @@ export default function SellerCourse({ params }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-sky-100">
-    <Navbar />
+      <Navbar />
       {/* Header Section */}
       <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white">
         <div className="max-w-6xl mx-auto px-6 py-8">
@@ -225,7 +226,9 @@ export default function SellerCourse({ params }) {
             {/* Course Thumbnail */}
             {course.thumbnail && (
               <div className="ml-8">
-                <img
+                <Image
+                  height={100}
+                  width={100}
                   src={course.thumbnail}
                   alt={course.title}
                   className="w-48 h-32 object-cover rounded-lg shadow-lg"
@@ -564,9 +567,7 @@ export default function SellerCourse({ params }) {
                                         </span>
                                       </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                      
-                                    </div>
+                                    <div className="flex gap-2"></div>
                                   </div>
                                 </div>
                               )
@@ -679,7 +680,9 @@ export default function SellerCourse({ params }) {
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={handleSubmitSection}
-                      disabled={loading || !newSection.title || !newSection.position}
+                      disabled={
+                        loading || !newSection.title || !newSection.position
+                      }
                       className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
                     >
                       {loading ? (

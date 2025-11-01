@@ -35,6 +35,7 @@ export default function CustomerPage() {
     // console.log(userRole)
     dispatch(clearError());
     dispatch(getAllCourses());
+    
   }, [dispatch, userRole]);
 
   
@@ -97,48 +98,7 @@ export default function CustomerPage() {
               </span>
             </div>
 
-            {(() => {
-              console.log("Rendering button for role:", userRole); // Debug log
-
-              if (userRole === "seller") {
-                return (
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                    Preview Only
-                  </div>
-                );
-              } else if (userRole === "customer") {
-                return (
-                  <button className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
-                    Enroll Now
-                  </button>
-                );
-              } else {
-                return (
-                  <button className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
-                    Login to Enroll
-                  </button>
-                );
-              }
-            })()}
+           
           </div>
         </div>
       </div>

@@ -7,11 +7,15 @@ import {
   createCourseDescription,
 } from "../redux/CourseSlice";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SellerHomepage() {
   const { currentSellerCourse, loading } = useSelector((state) => state.course);
-  const { user } = useSelector((state) => state.user);
+  const { user, profileInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  // ✅ Get user role
+  const userRole = profileInfo?.role || user?.role || "guest";
 
   // Course form state
   const [courseData, setCourseData] = useState({
@@ -24,7 +28,7 @@ export default function SellerHomepage() {
     instructor_id: user?.id || "",
     what_you_will_learn: [""],
     requirements: [""],
-    thumbnail: null, // Add thumbnail to state
+    thumbnail: null,
   });
 
   // Add state for image preview
@@ -48,6 +52,135 @@ export default function SellerHomepage() {
       }));
     }
   }, [user]);
+
+  // Restrict access for non-sellers
+  if (userRole !== "seller") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-lg text-center">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg
+                className="w-10 h-10 text-red-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+
+            {userRole === "customer" ? (
+              <>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Access Denied
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  As a <strong>customer</strong>, you cannot access the
+                  instructor dashboard. This area is only for course
+                  instructors.
+                </p>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">Your Role</span>
+                    <span className="font-semibold text-blue-600">
+                      {" "}
+                      Customer
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">Permissions</span>
+                    <span className="text-green-600 font-semibold">
+                      Browse & Enroll in Courses
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Instructor Access</span>
+                    <span className="text-red-600 font-semibold">
+                      Not Available
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Link href="/customer">
+                    <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                      Browse Courses
+                    </button>
+                  </Link>
+                  <Link href="/customer/my-enrollments">
+                    <button className="w-full border border-blue-300 bg-blue-50 text-blue-700 py-3 px-6 rounded-lg font-semibold hover:bg-blue-100 transition-colors">
+                      My Enrolled Courses
+                    </button>
+                  </Link>
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-gray-600 mb-3">
+                      To become an instructor create new account as seller or
+                      teacher.
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Login Required
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  You need to <strong>login as an instructor</strong> to access
+                  the course management dashboard.
+                </p>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">Current Status</span>
+                    <span className="font-semibold text-gray-500">
+                      Guest User
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">Required Role</span>
+                    <span className="text-orange-600 font-semibold">
+                      Instructor
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Access Level</span>
+                    <span className="font-semibold">
+                      Create & Manage Courses
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Link href="/auth/login">
+                    <button className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
+                      Login as Instructor
+                    </button>
+                  </Link>
+                  <Link href="/auth/signup">
+                    <button className="w-full border border-orange-300 bg-orange-50 text-orange-700 py-3 px-6 rounded-lg font-semibold hover:bg-orange-100 transition-colors">
+                      Create Instructor Account
+                    </button>
+                  </Link>
+                  <Link href="/customer">
+                    <button className="w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                      Browse Courses as Student
+                    </button>
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -116,7 +249,6 @@ export default function SellerHomepage() {
     formData.append("language", courseData.language);
     formData.append("instructor_id", courseData.instructor_id);
 
-    // Add arrays as JSON strings
     const cleanedWhatYouWillLearn = courseData.what_you_will_learn.filter(
       (item) => item.trim() !== ""
     );
@@ -134,13 +266,14 @@ export default function SellerHomepage() {
     if (courseData.thumbnail) {
       formData.append("thumbnail", courseData.thumbnail);
     }
- 
-    console.log("FormData prepared for submission",);
+
+    console.log("FormData prepared for submission");
 
     const result = dispatch(createCourseDescription(formData));
     console.log(result);
   };
 
+  // Main seller dashboard - Only accessible to sellers
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -148,83 +281,119 @@ export default function SellerHomepage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Course Management
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Create, manage, and publish your courses
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Instructor Dashboard
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Create, manage, and publish your courses
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
+                Instructor
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Your Courses Section */}
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">
-              Your Courses
+              Your Courses ({currentSellerCourse.length})
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentSellerCourse.map((course) => (
-              <Link
-              href={`/seller/course/${course.id}`}
-                key={course.id}
-                className="bg-white rounded-lg shadow-sm border overflow-hidden"
-              >
-                <div className="h-48 bg-gradient-to-br from-gray-700 to-gray-800 relative">
-                  <img
-                    src={course.thumbnail}
-                    className="w-full h-full object-cover"
-                    alt={course.title}
+          {currentSellerCourse.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-300">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
-                </div>
-                <div className="p-6 bg-gray-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-black">
-                      {course.title}
-                    </h3>
-                    
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No courses yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Create your first course to start sharing your knowledge with
+                students.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentSellerCourse.map((course) => (
+                <Link
+                  href={`/seller/course/${course.id}`}
+                  key={course.id}
+                  className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="h-48 bg-gradient-to-br from-gray-700 to-gray-800 relative">
+                    <Image
+                      height={100}
+                      width={100}
+                      src={course.thumbnail}
+                      className="w-full h-full object-cover"
+                      alt={course.title}
+                    />
                   </div>
+                  <div className="p-6 bg-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-black">
+                        {course.title}
+                      </h3>
+                    </div>
 
-                  <div className="space-y-2 text-sm text-black">
-                    <div className="flex justify-between">
-                      <span>Level:</span>
-                      <span className="font-medium">{course.level}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Price:</span>
-                      <span className="font-medium"> ₹ {course.price}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Rating:</span>
-                      <span className="font-medium flex items-center">
-                        {course.rating > 0 ? (
-                          <>
-                            <svg
-                              className="w-4 h-4 text-yellow-400 mr-1"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {course.rating}
-                          </>
-                        ) : (
-                          "No ratings"
-                        )}
-                      </span>
+                    <div className="space-y-2 text-sm text-black">
+                      <div className="flex justify-between">
+                        <span>Level:</span>
+                        <span className="font-medium">{course.level}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Price:</span>
+                        <span className="font-medium"> ₹ {course.price}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Rating:</span>
+                        <span className="font-medium flex items-center">
+                          {course.rating > 0 ? (
+                            <>
+                              <svg
+                                className="w-4 h-4 text-yellow-400 mr-1"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              {course.rating}
+                            </>
+                          ) : (
+                            "No ratings"
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
-
-                 
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Create New Course Section */}
-        <div className="bg-white rounded-lg shadow-sm border ">
+        <div className="bg-white rounded-lg shadow-sm border">
           <div className="px-6 py-4 border-b bg-gray-900 border-gray-200">
             <h2 className="text-2xl font-semibold text-white">
               Create New Course
@@ -283,7 +452,9 @@ export default function SellerHomepage() {
                     />
                     {imagePreview && (
                       <div className="relative">
-                        <img
+                        <Image
+                          height={100}
+                          width={100}
                           src={imagePreview}
                           alt="Course thumbnail preview"
                           className="w-full h-48 object-cover rounded-lg border"
@@ -292,7 +463,10 @@ export default function SellerHomepage() {
                           type="button"
                           onClick={() => {
                             setImagePreview(null);
-                            setCourseData((prev) => ({ ...prev, thumbnail: null }));
+                            setCourseData((prev) => ({
+                              ...prev,
+                              thumbnail: null,
+                            }));
                           }}
                           className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
                         >
