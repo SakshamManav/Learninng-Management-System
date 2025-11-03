@@ -269,8 +269,23 @@ export default function SellerHomepage() {
 
     console.log("FormData prepared for submission");
 
-    const result = dispatch(createCourseDescription(formData));
-    console.log(result);
+    // dispatch and wait for result
+    try {
+      const action = await dispatch(createCourseDescription(formData));
+      // If using createAsyncThunk, check meta.requestStatus
+      const succeeded =
+        (action && action.meta && action.meta.requestStatus === "fulfilled") ||
+        (action && action.payload); // fallback
+
+      if (succeeded) {
+        // reload to reflect new course
+        window.location.reload();
+      } else {
+        console.error("Course creation failed", action);
+      }
+    } catch (err) {
+      console.error("Error dispatching createCourseDescription:", err);
+    }
   };
 
   // Main seller dashboard - Only accessible to sellers

@@ -2,10 +2,19 @@
 export default {
   reactStrictMode: true,
   images: {
-    domains: [
-      "tkmnvqikrjxcwhqqogvw.supabase.co",
-      "foundr.com",
-      "encrypted-tbn0.gstatic.com",
+     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

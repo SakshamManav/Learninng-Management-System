@@ -146,9 +146,9 @@ export default function Navbar() {
                   onClick={toggleProfileDropdown}
                   className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                 >
-                  {displayUser?.profile_Picture ? (
+                  {displayUser?.profile_Picture? (
                     <Image 
-                      src={displayUser.profile_Picture} 
+                      src={displayUser?.profile_Picture} 
                       alt="Profile" 
                       width={40}
                       height={40}

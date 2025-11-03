@@ -262,7 +262,7 @@ export default function SellerCourse({ params }) {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
+   
       <div className="bg-white shadow-sm border-b border-sky-200">
         <div className="max-w-6xl mx-auto px-6">
           <nav className="flex space-x-8">
@@ -270,11 +270,11 @@ export default function SellerCourse({ params }) {
               <button
                 key={section}
                 onClick={() => setActiveSection(section)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize transition-colors duration-200 ₹ {
-                                    activeSection === section
-                                        ? 'border-sky-500 text-sky-600'
-                                        : 'border-transparent text-gray-500 hover:text-sky-600 hover:border-sky-300'
-                                }`}
+                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize transition-colors duration-200 ${ 
+                  activeSection === section
+                    ? "border-sky-500 text-sky-600"
+                    : "border-transparent text-gray-500 hover:text-sky-600 hover:border-sky-300"
+                }`}
               >
                 {section}
               </button>
@@ -466,9 +466,7 @@ export default function SellerCourse({ params }) {
                               className="p-1 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                             >
                               <svg
-                                className={`w-5 h-5 text-gray-600 transition-transform duration-200 ₹ {
-                                                                    expandedSections.has(section.id) ? 'rotate-90' : ''
-                                                                }`}
+                                className={`w-5 h-5 text-gray-600 transform transition-transform duration-200 ${expandedSections.has(section.id) ? 'rotate-90' : ''}`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
