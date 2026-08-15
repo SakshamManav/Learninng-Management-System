@@ -1,125 +1,113 @@
-# eduKnow - Learning Management System (LMS)
+# eduKnow
 
-A full-stack Learning Management System (LMS) that enables instructors to create and manage online courses while allowing students to browse, enroll, and securely access video-based content.
-
-The platform implements role-based access control, secure video delivery using Supabase Signed URLs, and authentication through Auth0.
+Full-stack Learning Management System where instructors build video-based courses and students browse, enroll, and stream content securely.
 
 ---
 
-## Tech Stack
+## What it does
 
-### Frontend
-- Next.js
-- React.js
-- Tailwind CSS
-
-### Backend
-- Node.js
-- Express.js
-
-### Database
-- MySQL
-
-### Authentication & Authorization
-- Auth0
-- JWT (JSON Web Tokens)
-
-### Cloud Storage
-- Supabase Storage
-  - Course thumbnails
-  - Course videos
-  - Secure Signed URL generation
+eduKnow gives instructors a full course-authoring flow — create a course, organize it into sections and lectures, upload thumbnails and video, and publish it — while students browse the catalog, enroll, and stream lecture videos from a personal dashboard. The core problem the platform solves isn't just CRUD over courses: it's making sure video content is only ever watchable by someone who's actually enrolled, without exposing raw file URLs.
 
 ---
 
-## Features
+## Technical highlights
 
-### Student Features
+**Signed URL video delivery** — Course videos live in Supabase Storage as private objects, not public files. Instead of serving a direct link, the backend generates a short-lived Signed URL on request, checks enrollment first, and hands the student a URL that expires. This means video access is enforced server-side per-request rather than relying on an obscure-but-guessable public link.
 
+**Auth0 + JWT authorization layer** — Authentication is delegated to Auth0 (login/registration, session handling), while JWTs carry role and identity into the backend, where role-based middleware gates routes — an instructor can create/edit courses, a student can enroll/view, and API routes are protected accordingly rather than trusting the frontend to hide UI elements.
+
+**Enrollment-gated content access** — Enrollment isn't just a UI flag; it's the actual authorization check between "a course exists" and "you can stream its videos." A user browsing the catalog and a user watching a lecture hit different authorization boundaries even for the same course.
+
+**Structured course hierarchy** — Courses are modeled as Course → Sections → Lectures, each level with its own metadata, which supports partial course editing (add one lecture without touching the rest) and lets the frontend render a normal course-outline UI directly off the data shape.
+
+---
+
+## Architecture
+
+```
+        ┌──────────────┐
+        │   Student /   │
+        │  Instructor   │
+        │  (Next.js UI) │
+        └──────┬────────┘
+               │ HTTPS + JWT
+        ┌──────▼────────┐
+        │  Node.js /    │
+        │  Express API  │
+        └──────┬────────┘
+       ┌────────┼─────────┐
+       │        │          │
+┌──────▼────┐ ┌─▼──────┐ ┌─▼─────────────┐
+│  MySQL    │ │ Auth0  │ │  Supabase      │
+│  courses, │ │ auth   │ │  Storage       │
+│  users,   │ │        │ │  (thumbnails,  │
+│  enroll-  │ │        │ │   videos +     │
+│  ments    │ │        │ │  Signed URLs)  │
+└───────────┘ └────────┘ └────────────────┘
+```
+
+**Video access flow:**
+
+1. Student requests a lecture video
+2. Backend verifies the JWT and checks the enrollment record for that course
+3. If enrolled, backend requests a time-limited Signed URL from Supabase Storage
+4. Signed URL is returned to the client and used to stream the video directly
+5. URL expires — repeat requests re-run the enrollment check
+
+---
+
+## User roles
+
+**Student**
 - Browse all available courses
 - View detailed course information
 - Enroll in courses
-- Access purchased/enrolled content
-- Watch videos securely
-- Manage profile information
-- View enrolled courses dashboard
+- Stream video content for enrolled courses only
+- Manage profile and view an enrolled-courses dashboard
 
-### Instructor Features
-
-- Create new courses
-- Upload course thumbnails
-- Add sections and lectures
-- Upload video content
-- Edit course details
-- Manage personal courses
-- Preview courses before publishing
-- Update instructor profile
-
-### Authentication & Security
-
-- Auth0 authentication
-- Secure login and registration
-- JWT-based authorization
-- Role-based access control
-- Protected API routes
-- Secure content access
-
-### Video Delivery System
-
-- Videos stored in Supabase Storage
-- Secure Signed URLs generated dynamically
-- Prevents direct public access to video files
-- Only enrolled users can access course content
+**Instructor**
+- Create and publish courses
+- Upload thumbnails and video content
+- Structure courses into sections and lectures
+- Edit course details and preview before publishing
+- Manage their own course catalog and profile
 
 ---
 
-## System Architecture
+## Tech stack
 
-### User Roles
-
-#### Student
-
-- Browse courses
-- Enroll in courses
-- Access enrolled courses
-- Watch course videos
-- Manage profile
-
-#### Instructor
-
-- Create courses
-- Upload videos
-- Manage sections
-- Edit course content
-- Manage profile
+| Layer | Choices |
+|---|---|
+| Frontend | Next.js, React.js, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | MySQL |
+| Auth | Auth0, JWT |
+| Storage | Supabase Storage (thumbnails, video, Signed URLs) |
 
 ---
 
-## Database Design
+## Database design
 
-Core entities include:
-
-- Users
-- Courses
-- Sections
-- Lectures
-- Enrollments
-- User Profiles
-
-Relationships:
+Core entities:
+- **Users** — student/instructor accounts and profiles
+- **Courses** — owned by an instructor
+- **Sections** — group lectures within a course
+- **Lectures** — individual video units
+- **Enrollments** — links users to courses they can access
 
 ```text
 User
- ├── Creates Courses
- ├── Enrolls in Courses
+ ├── Creates Courses (as Instructor)
+ ├── Enrolls in Courses (as Student)
  └── Manages Profile
 
 Course
- ├── Contains Sections
- └── Owned by Instructor
+ ├── Owned by Instructor
+ └── Contains Sections
 
 Section
  └── Contains Lectures
 
 Lecture
- └── Contains Video Content
+ └── Contains Video Content (Supabase, Signed URL access)
+```
